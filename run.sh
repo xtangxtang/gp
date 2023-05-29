@@ -1,6 +1,10 @@
 #!/bin/sh -e
 
-rm -rf *.xls
-rm -rf *.xlsx
+rm -rf gp_list/*.xls
+rm -rf gp_list/*.xlsx
 
 python3 get_gplist.py
+
+mv *.xls gp_list/
+sleep 5
+mv ShowReport.xlsx gp_list/sz.xlsx

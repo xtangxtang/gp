@@ -20,7 +20,7 @@ chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 driver = webdriver.Chrome('/usr/bin/chromedriver',chrome_options=chrome_options)
 
-
+print("Get 上海主板A股")
 driver.get("http://www.sse.com.cn/assortment/stock/list/share/")
 time.sleep(3)
 
@@ -32,6 +32,7 @@ excel_button.click()
 time.sleep(10)
 os.rename('GPLIST.xls', 'sh_zhuban.xls')
 
+print("Get 科创板")
 select = Select(driver.find_element_by_class_name("selectpicker"))
 select.select_by_visible_text('科创板')
 time.sleep(3)
@@ -40,7 +41,7 @@ excel_button.click()
 time.sleep(10)
 os.rename('GPLIST.xls', 'sh_kcb.xls')
 
-
+print("Get 深圳A股")
 driver.get("http://www.szse.cn/market/product/stock/list/index.html")
 time.sleep(3)
 excel_button = driver.find_element(By.CLASS_NAME, 'btn-default-excel')
