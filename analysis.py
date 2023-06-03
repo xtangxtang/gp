@@ -9,6 +9,7 @@ from fitter import Fitter, get_common_distributions, get_distributions
 import numpy as np
 from scipy.stats import entropy
 from math import log, e
+import os
 # Customize matplotlib
 warnings.filterwarnings("ignore", message="Glyph 146 missing from current font.")
 
@@ -51,25 +52,73 @@ def entropy4(labels, base=None):
   base = e if base is None else base
   return -(norm_counts * np.log(norm_counts)/np.log(base)).sum()
 
+def analysis_entropy():
+    dir_list = os.listdir("gp_daily")
+    cwd = os.getcwd()
+    os.chdir("gp_daily")
+    
+    col_names=["symbols"]
 
-with open('000001_20171130.csv', 'r', encoding='utf-8') as file:
-    data = file.readlines()
-  
-# print(data)
-data[0] = "市场代码,证券代码,时间,最新价,成交笔数,成交额,成交量,方向,买一价,买二价,买三价,买四价,买五价,卖一价,卖二价,卖三价,卖四价,卖五价,买一量,买二量,买三量,买四量,买五量,卖一量,卖二量,卖三量,卖四量,卖五量\n"
-  
-with open('000001_20171130.csv', 'w', encoding='utf-8') as file:
-    file.writelines(data)
+    entr_file = f"entropy/entropy.csv"
+    if os.path.exists(entr_file):
+      entropy_df = pd.read_csv(entr_file, delimiter=",")      
+    else:
+      entropy_df = pd.DataFrame(columns=col_names)
+    entropy_df.set_index("symbols")
 
-dataset = pd.read_csv("000001_20171130.csv")
-# dataset.head()
+    for symbol in dir_list:
+      print(f"{symbol}")
+      datefiles = os.listdir(symbol)
+      os.chdir(symbol)
+      for datef in datefiles:
+        dataset = pd.read_csv(datef, delimiter=",")
+        date = os.path.splitext(datef)[0]        
+        sliced_df = dataset.loc[:,["成交价","成交量(手)"]]
+        # print(sliced_df.head)
+        group_zxj = dataset.groupby("成交价").agg({'成交量(手)': ['sum']})
+        # print(group_zxj) 
+        bin_num=len(group_zxj.index)
+        # print(f"bin_num {bin_num}")
+        cjbs_list =  np.array(list(group_zxj.iloc[:, 0]))
+        # print(cjbs_list)
+        
+        entr = entropy(cjbs_list)
+        # print(f"    {date} entropy: {entr}")
+        # entr = entropy1(cjbs_list)
+        # print("entropy1: " + str(entr))
+        # entr = entropy2(cjbs_list)
+        # print("entropy2: " + str(entr))
+        # entr = entropy3(cjbs_list)
+        # print("entropy3: " + str(entr))
+        # entr = entropy4(cjbs_list)
+        # print("entropy4: " + str(entr)) 
+        exist_col_names = entropy_df.columns.values.tolist()
+        if (entropy_df["symbols"] == symbol).any():
+          if date in exist_col_names:
+            entropy_df.loc[entropy_df["symbols"] == symbol, date] = entr
+            print("0 entropy_df: ")
+            print(entropy_df)
+          else:
+            entropy_df[date]=""
+            entropy_df.loc[entropy_df["symbols"] == symbol, date] = entr
+            print("1 entropy_df: ")
+            print(entropy_df)            
+        else:
+          if date in exist_col_names:
+            entropy_df.loc[len(entropy_df)] = symbol
+            entropy_df.loc[entropy_df["symbols"] == symbol, date] = entr
+            print("2 entropy_df: ")
+            print(entropy_df)  
+          else:
+            entropy_df.loc[len(entropy_df)] = symbol
+            entropy_df[date]=""
+            entropy_df.loc[entropy_df["symbols"] == symbol, date] = entr
+            print("3 entropy_df: ")
+            print(entropy_df) 
+      os.chdir("../")
+    entropy_df = entropy_df.reindex(columns=["symbols"])
+    entropy_df.to_csv(cwd+"/entropy/entropy.csv")
+    os.chdir(cwd)  
 
-group_zxj = dataset.groupby("最新价").agg({'成交笔数': ['sum']})
-print(group_zxj)
-
-bin_num=len(group_zxj.index)
-print(f"bin_num {bin_num}")
-cjbs_list =  np.array(list(group_zxj.iloc[:, 0]))
-print(cjbs_list)
-entr = entropy(cjbs_list)
-print("entropy: " + str(entr))
+if __name__ == "__main__":
+  analysis_entropy()

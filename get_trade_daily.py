@@ -21,7 +21,7 @@ def get_daily(symbols, working_path, __time=""):
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         print("Current Time =", current_time)
-        today_time = datetime.today().strftime('%Y-%-m-%-d')  
+        today_time = datetime.today().strftime('%Y-%-mm-%-dd')  
     else:
         today_time = __time
 
@@ -92,7 +92,7 @@ def get_daily(symbols, working_path, __time=""):
                 total_detail_df = pd.concat([detail_df_tmp,total_detail_df]).drop_duplicates()
             except Exception as e:
                 print(f"got exception while looping {sysmbol}: " + str(e))
-                # print(df_tmp)
+                print(df_tmp)
                 # exit(0)
                 time.sleep(15)
                 continue
@@ -111,6 +111,17 @@ def create_folder(symbols):
     for sysmbol in symbols:
         if not os.path.exists(f"gp_daily/{sysmbol}"):
             os.makedirs(f"gp_daily/{sysmbol}")
+
+def rename_file():
+    dir_list = os.listdir("gp_daily")
+    cwd = os.getcwd()
+    os.chdir("gp_daily")
+    for symb_dir in dir_list:
+        os.chdir(symb_dir)
+        if os.path.exists("2023-6-2.csv"):
+            os.rename("2023-6-2.csv", "2023-06-02.csv")
+        os.chdir("../")
+    os.chdir(cwd)    
 
 def remove_files_not_self_list(self_gplist):
     dir_list = os.listdir("gp_daily")
@@ -139,8 +150,8 @@ if __name__ == "__main__":
     # parser.add_argument("-m", "--MultipleThreads", help="MultipleThreads")
     # parser.add_argument("-s", "--StockType", help="StockType")
 
-    # chunks_num =5
-    # working_path = os.getcwd()
+    chunks_num =5
+    working_path = os.getcwd()
     # args = parser.parse_args()
 
     # MultipleThreads = int(args.MultipleThreads)
@@ -179,7 +190,8 @@ if __name__ == "__main__":
     # create_folder(symbols_sz)
 
     # self_gplist = symbols_zhuban + symbols_kcb + symbols_sz
-
+    rename_file()
+    exit(0)
     self_gplist = ["sz300491", "sh688316", "sh605358", "sh603348", "sh688981",
                       "sh688008", "sh688123", "sh688146", "sh688268", "sz300236",
                       "sh688208", "sz300693", "sz001314", "sz002169", "sh688663", 
@@ -192,12 +204,12 @@ if __name__ == "__main__":
     
     chunks_num =5
     remove_files_not_self_list(self_gplist)
-    exit(0)
 
+    today_time = "2023-06-01"
     self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
     self_gplist_threads = []
     for i in range(chunks_num):    
-        t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path))
+        t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path, today_time))
         t.name = f"sh_zhuban_{i}"
         print(t.getName())
         self_gplist_threads.append(t)
