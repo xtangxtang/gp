@@ -10,6 +10,13 @@ import numpy as np
 from scipy.stats import entropy
 from math import log, e
 import os
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import argparse
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 # Customize matplotlib
 warnings.filterwarnings("ignore", message="Glyph 146 missing from current font.")
 
@@ -116,9 +123,70 @@ def analysis_entropy():
             print("3 entropy_df: ")
             print(entropy_df) 
       os.chdir("../")
-    entropy_df = entropy_df.reindex(columns=["symbols"])
     entropy_df.to_csv(cwd+"/entropy/entropy.csv")
     os.chdir(cwd)  
+  
+def draw_daily_line(symbol, date):
+  dir_list = os.listdir("gp_daily")
+  cwd = os.getcwd()
+  os.chdir("gp_daily")
+
+  if not os.path.exists(symbol):
+    print(f"{symbol} is not in directory: " + os.getcwd())
+  os.chdir(symbol)
+  csv_file = date + ".csv"
+  daily_df = pd.read_csv(csv_file, delimiter=",")
+  daily_df.drop(daily_df[daily_df["成交价"] == 0.00].index, inplace = True)
+  
+  print(daily_df)
+  fig1 = make_subplots(specs=[[{"secondary_y": True}]])
+  fig1.add_trace(go.Scatter(x=daily_df.index,y=daily_df['成交价'],name='Price'),secondary_y=False)
+  fig1.add_trace(go.Bar(x=daily_df.index,y=daily_df['成交量(手)'],name='成交量(手)'),secondary_y=True)
+  # fig1.update_yaxes(range=[0,7000000000],secondary_y=True)
+  # fig1.update_yaxes(visible=False, secondary_y=True)
+  fig1.show()
+
+  daily_df.hist(column="成交价").show()
+  os.chdir(cwd)
+
+def  correlation_analysis():
+  file_names = [...]  # 填写您的CSV文件路径和文件名列表
+
+  data_frames = []  # 存储每个CSV文件的数据帧
+
+  for file_name in file_names:
+      data = pd.read_csv(file_name)
+      data_frames.append(data)
+
+  correlation_matrix = pd.DataFrame()  # 存储相关性矩阵
+
+  for i in range(len(data_frames)):
+      for j in range(i+1, len(data_frames)):
+          df1 = data_frames[i]
+          df2 = data_frames[j]
+          
+          # 计算两个数据帧之间的相关性（使用适当的方法，如Pearson相关系数）
+          correlation = df1.corrwith(df2)
+          
+          # 将相关性结果存储到相关性矩阵中
+          correlation_matrix[f"{file_names[i]} - {file_names[j]}"] = correlation
+
+  # 创建热图
+  plt.figure(figsize=(10, 8))
+  sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", vmin=-1, vmax=1)
+
+  # 添加标题和标签
+  plt.title("Correlation Matrix")
+  plt.xlabel("Files")
+  plt.ylabel("Files")
+
+  # 展示热图
+  plt.show()
 
 if __name__ == "__main__":
-  analysis_entropy()
+  # parser = argparse.ArgumentParser()
+  # parser.add_argument("-e", "--Entropy", help="Entropy")
+  # parser.add_argument("-pd", "--PlotDaily", help="PlotDaily")
+
+  # analysis_entropy()
+  # draw_daily_line("sz002169","2023-06-02")
