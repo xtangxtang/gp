@@ -205,23 +205,23 @@ if __name__ == "__main__":
     # chunks_num =5
     remove_files_not_self_list(self_gplist)
 
-    # today_time = ""
-    # self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
-    # self_gplist_threads = []
-    # for i in range(chunks_num):    
-    #     t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path, today_time))
-    #     t.name = f"sh_zhuban_{i}"
-    #     print(t.getName())
-    #     self_gplist_threads.append(t)
+    today_time = ""
+    self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
+    self_gplist_threads = []
+    for i in range(chunks_num):    
+        t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path, today_time))
+        t.name = f"sh_zhuban_{i}"
+        print(t.getName())
+        self_gplist_threads.append(t)
 
-    # for i in range(chunks_num):
-    #     print("i " + str(i))
-    #     self_gplist_threads[i].start()
-    #     os.chdir(working_path)
+    for i in range(chunks_num):
+        print("i " + str(i))
+        self_gplist_threads[i].start()
+        os.chdir(working_path)
         
-    # for i in range(chunks_num):
-    #     self_gplist_threads[i].join()
-    #     os.chdir(working_path)  
+    for i in range(chunks_num):
+        self_gplist_threads[i].join()
+        os.chdir(working_path)  
 
     get_daily(self_gplist, working_path, "")
 
