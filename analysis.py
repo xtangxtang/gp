@@ -16,6 +16,7 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
 
 # Customize matplotlib
 warnings.filterwarnings("ignore", message="Glyph 146 missing from current font.")
@@ -59,18 +60,16 @@ def entropy4(labels, base=None):
   base = e if base is None else base
   return -(norm_counts * np.log(norm_counts)/np.log(base)).sum()
 
-def analysis_entropy():
+def analysis_entropy(today_time=""):
     dir_list = os.listdir("gp_daily")
-    cwd = os.getcwd()
+    working_path = os.getcwd()
     os.chdir("gp_daily")
     
     col_names=["symbols"]
 
     entr_file = f"entropy/entropy.csv"
-    if os.path.exists(entr_file):
-      entropy_df = pd.read_csv(entr_file, delimiter=",")      
-    else:
-      entropy_df = pd.DataFrame(columns=col_names)
+
+    entropy_df = pd.DataFrame(columns=col_names)
     entropy_df.set_index("symbols")
 
     for symbol in dir_list:
@@ -79,7 +78,9 @@ def analysis_entropy():
       os.chdir(symbol)
       for datef in datefiles:
         dataset = pd.read_csv(datef, delimiter=",")
-        date = os.path.splitext(datef)[0]        
+        date = os.path.splitext(datef)[0]  
+        if today_time != "" and date != today_time:    
+          continue
         sliced_df = dataset.loc[:,["成交价","成交量(手)"]]
         # print(sliced_df.head)
         group_zxj = dataset.groupby("成交价").agg({'成交量(手)': ['sum']})
@@ -123,70 +124,87 @@ def analysis_entropy():
             print("3 entropy_df: ")
             print(entropy_df) 
       os.chdir("../")
-    entropy_df.to_csv(cwd+"/entropy/entropy.csv")
-    os.chdir(cwd)  
+    
+    os.chdir(working_path)
+    pre_entropy_df = pd.DataFrame(columns=col_names)
+    if os.path.exists(entr_file):
+       print("entr_file: " + entr_file)
+       pre_entropy_df = pd.read_csv(entr_file, delimiter=",")
+       
+    pre_entropy_df = pre_entropy_df.set_index("symbols")
+    print("pre_entropy_df:")
+    print(pre_entropy_df)
+    entropy_df = entropy_df.set_index("symbols")
+    entropy_df = pd.concat([pre_entropy_df,entropy_df], axis=1).drop_duplicates()
+    print(entropy_df)
+    entropy_df.to_csv(working_path+"/entropy/entropy.csv")
+    os.chdir(working_path)  
   
-def draw_daily_line(symbol, date):
-  dir_list = os.listdir("gp_daily")
-  cwd = os.getcwd()
-  os.chdir("gp_daily")
+# def draw_daily_line(symbol, date):
+#   dir_list = os.listdir("gp_daily")
+#   cwd = os.getcwd()
+#   os.chdir("gp_daily")
 
-  if not os.path.exists(symbol):
-    print(f"{symbol} is not in directory: " + os.getcwd())
-  os.chdir(symbol)
-  csv_file = date + ".csv"
-  daily_df = pd.read_csv(csv_file, delimiter=",")
-  daily_df.drop(daily_df[daily_df["成交价"] == 0.00].index, inplace = True)
+#   if not os.path.exists(symbol):
+#     print(f"{symbol} is not in directory: " + os.getcwd())
+#   os.chdir(symbol)
+#   csv_file = date + ".csv"
+#   daily_df = pd.read_csv(csv_file, delimiter=",")
+#   daily_df.drop(daily_df[daily_df["成交价"] == 0.00].index, inplace = True)
   
-  print(daily_df)
-  fig1 = make_subplots(specs=[[{"secondary_y": True}]])
-  fig1.add_trace(go.Scatter(x=daily_df.index,y=daily_df['成交价'],name='Price'),secondary_y=False)
-  fig1.add_trace(go.Bar(x=daily_df.index,y=daily_df['成交量(手)'],name='成交量(手)'),secondary_y=True)
-  # fig1.update_yaxes(range=[0,7000000000],secondary_y=True)
-  # fig1.update_yaxes(visible=False, secondary_y=True)
-  fig1.show()
+#   print(daily_df)
+#   fig1 = make_subplots(specs=[[{"secondary_y": True}]])
+#   fig1.add_trace(go.Scatter(x=daily_df.index,y=daily_df['成交价'],name='Price'),secondary_y=False)
+#   fig1.add_trace(go.Bar(x=daily_df.index,y=daily_df['成交量(手)'],name='成交量(手)'),secondary_y=True)
+#   # fig1.update_yaxes(range=[0,7000000000],secondary_y=True)
+#   # fig1.update_yaxes(visible=False, secondary_y=True)
+#   fig1.show()
 
-  daily_df.hist(column="成交价").show()
-  os.chdir(cwd)
+#   daily_df.hist(column="成交价").show()
+#   os.chdir(cwd)
 
-def  correlation_analysis():
-  file_names = [...]  # 填写您的CSV文件路径和文件名列表
+# def  correlation_analysis():
+#   file_names = [...]  # 填写您的CSV文件路径和文件名列表
 
-  data_frames = []  # 存储每个CSV文件的数据帧
+#   data_frames = []  # 存储每个CSV文件的数据帧
 
-  for file_name in file_names:
-      data = pd.read_csv(file_name)
-      data_frames.append(data)
+#   for file_name in file_names:
+#       data = pd.read_csv(file_name)
+#       data_frames.append(data)
 
-  correlation_matrix = pd.DataFrame()  # 存储相关性矩阵
+#   correlation_matrix = pd.DataFrame()  # 存储相关性矩阵
 
-  for i in range(len(data_frames)):
-      for j in range(i+1, len(data_frames)):
-          df1 = data_frames[i]
-          df2 = data_frames[j]
+#   for i in range(len(data_frames)):
+#       for j in range(i+1, len(data_frames)):
+#           df1 = data_frames[i]
+#           df2 = data_frames[j]
           
-          # 计算两个数据帧之间的相关性（使用适当的方法，如Pearson相关系数）
-          correlation = df1.corrwith(df2)
+#           # 计算两个数据帧之间的相关性（使用适当的方法，如Pearson相关系数）
+#           correlation = df1.corrwith(df2)
           
-          # 将相关性结果存储到相关性矩阵中
-          correlation_matrix[f"{file_names[i]} - {file_names[j]}"] = correlation
+#           # 将相关性结果存储到相关性矩阵中
+#           correlation_matrix[f"{file_names[i]} - {file_names[j]}"] = correlation
 
-  # 创建热图
-  plt.figure(figsize=(10, 8))
-  sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", vmin=-1, vmax=1)
+#   # 创建热图
+#   plt.figure(figsize=(10, 8))
+#   sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", vmin=-1, vmax=1)
 
-  # 添加标题和标签
-  plt.title("Correlation Matrix")
-  plt.xlabel("Files")
-  plt.ylabel("Files")
+#   # 添加标题和标签
+#   plt.title("Correlation Matrix")
+#   plt.xlabel("Files")
+#   plt.ylabel("Files")
 
-  # 展示热图
-  plt.show()
+#   # 展示热图
+#   plt.show()
 
 if __name__ == "__main__":
-  # parser = argparse.ArgumentParser()
-  # parser.add_argument("-e", "--Entropy", help="Entropy")
+  parser = argparse.ArgumentParser()
+  parser.add_argument("-d", "--Date", help="Date")
   # parser.add_argument("-pd", "--PlotDaily", help="PlotDaily")
+  
+  today_time = datetime.today().strftime('%Y-%m-%d')  
+  print(f"today_time: {today_time}")
 
-  # analysis_entropy()
+  today_time="2023-06-05"
+  analysis_entropy(today_time)
   # draw_daily_line("sz002169","2023-06-02")

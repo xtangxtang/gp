@@ -10,6 +10,7 @@ import threading
 from selenium import webdriver
 import argparse
 from fake_useragent import UserAgent
+import shutil
 
 def get_daily(symbols, working_path, __time=""):
     colnames=["成交时间", "成交价", "涨跌幅", "价格变动", "成交量(手)", "成交额(元)", "性质"] 
@@ -21,7 +22,7 @@ def get_daily(symbols, working_path, __time=""):
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         print("Current Time =", current_time)
-        today_time = datetime.today().strftime('%Y-%-mm-%-dd')  
+        today_time = datetime.today().strftime('%Y-%m-%d')  
     else:
         today_time = __time
 
@@ -132,7 +133,7 @@ def remove_files_not_self_list(self_gplist):
             continue
         else:
             if os.path.exists(file):
-                os.rmdir(file)
+                shutil.rmtree(file)
                 print("remove :" + file)    
 
     os.chdir(cwd)
@@ -190,38 +191,39 @@ if __name__ == "__main__":
     # create_folder(symbols_sz)
 
     # self_gplist = symbols_zhuban + symbols_kcb + symbols_sz
-    rename_file()
-    exit(0)
+    # rename_file()
+    # exit(0)
     self_gplist = ["sz300491", "sh688316", "sh605358", "sh603348", "sh688981",
-                      "sh688008", "sh688123", "sh688146", "sh688268", "sz300236",
-                      "sh688208", "sz300693", "sz001314", "sz002169", "sh688663", 
-                      "sh688170", "sh688137", "sz300842", "sh688293", "sh688305", 
-                      "sz300484", "sh688255", "sz300706", "sh688126", "sh688503", 
-                      "sh688063", "sh688724", "sz300568", "sh688390", "sh688041", 
-                      "sh688256", "sz300415", "sz300428", "sh603290", "sh603986", 
-                      "sh688158", "sh603881", "sz300346", "sh603650", "sh688012", 
-                      "sz300751"]
+                    "sh688008", "sh688123", "sh688146", "sh688268", "sz300236",
+                    "sh688208", "sz300693", "sz001314", "sz002169", "sh688663", 
+                    "sh688170", "sh688137", "sz300842", "sh688293", "sh688305", 
+                    "sz300484", "sh688255", "sz300706", "sh688126", "sh688503", 
+                    "sh688063", "sz300568", "sh688390", "sh688041", "sz300751",
+                    "sh688256", "sz300415", "sz300428", "sh603290", "sh603986", 
+                    "sh688158", "sh603881", "sz300346", "sh603650", "sh688012"]
     
-    chunks_num =5
+    # chunks_num =5
     remove_files_not_self_list(self_gplist)
 
-    today_time = "2023-06-01"
-    self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
-    self_gplist_threads = []
-    for i in range(chunks_num):    
-        t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path, today_time))
-        t.name = f"sh_zhuban_{i}"
-        print(t.getName())
-        self_gplist_threads.append(t)
+    # today_time = ""
+    # self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
+    # self_gplist_threads = []
+    # for i in range(chunks_num):    
+    #     t = threading.Thread(target=get_daily, args=(self_gplist_cks[i], working_path, today_time))
+    #     t.name = f"sh_zhuban_{i}"
+    #     print(t.getName())
+    #     self_gplist_threads.append(t)
 
-    for i in range(chunks_num):
-        print("i " + str(i))
-        self_gplist_threads[i].start()
-        os.chdir(working_path)
+    # for i in range(chunks_num):
+    #     print("i " + str(i))
+    #     self_gplist_threads[i].start()
+    #     os.chdir(working_path)
         
-    for i in range(chunks_num):
-        self_gplist_threads[i].join()
-        os.chdir(working_path)   
+    # for i in range(chunks_num):
+    #     self_gplist_threads[i].join()
+    #     os.chdir(working_path)  
+
+    get_daily(self_gplist, working_path, "")
 
     # parser = argparse.ArgumentParser()
     # parser.add_argument("-m", "--MultipleThreads", help="MultipleThreads")
