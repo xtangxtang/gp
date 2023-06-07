@@ -137,7 +137,7 @@ def analysis_entropy(today_time=""):
     entropy_df = entropy_df.set_index("symbols")
     entropy_df = pd.concat([pre_entropy_df,entropy_df], axis=1).drop_duplicates()
     print(entropy_df)
-    entropy_df.to_csv(working_path+"/entropy/entropy.csv")
+    entropy_df.to_csv(working_path+"/entropy/entropy.csv", index_label="symbols")
     os.chdir(working_path)  
   
 # def draw_daily_line(symbol, date):
@@ -205,6 +205,6 @@ if __name__ == "__main__":
   today_time = datetime.today().strftime('%Y-%m-%d')  
   print(f"today_time: {today_time}")
 
-  today_time="2023-06-05"
+  today_time="2023-06-06"
   analysis_entropy(today_time)
   # draw_daily_line("sz002169","2023-06-02")

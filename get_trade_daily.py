@@ -32,6 +32,8 @@ def get_daily(symbols, working_path, __time=""):
         print("sysmbol: " + sysmbol)
         time.sleep(throttle)
         csv_dir = f"{working_path}/gp_daily/{sysmbol}"
+        if os.path.exists(csv_dir) == False:
+            os.mkdir(csv_dir)
         os.chdir(csv_dir)
         csv_file = f"{csv_dir}/{today_time}.csv"
         if os.path.exists(csv_file):
@@ -200,7 +202,8 @@ if __name__ == "__main__":
                     "sz300484", "sh688255", "sz300706", "sh688126", "sh688503", 
                     "sh688063", "sz300568", "sh688390", "sh688041", "sz300751",
                     "sh688256", "sz300415", "sz300428", "sh603290", "sh603986", 
-                    "sh688158", "sh603881", "sz300346", "sh603650", "sh688012"]
+                    "sh688158", "sh603881", "sz300346", "sh603650", "sh688012",
+                    "sz300001"]
     
     # chunks_num =5
     remove_files_not_self_list(self_gplist)
