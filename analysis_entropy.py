@@ -205,6 +205,6 @@ if __name__ == "__main__":
   today_time = datetime.today().strftime('%Y-%m-%d')  
   print(f"today_time: {today_time}")
 
-  today_time="2023-06-06"
+  today_time="2023-06-07"
   analysis_entropy(today_time)
   # draw_daily_line("sz002169","2023-06-02")

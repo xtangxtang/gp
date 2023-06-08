@@ -17,6 +17,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
+from datetime import date, timedelta
+
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
 
 def analysis_vol(today_time=""):
     dir_list = os.listdir("gp_daily")
@@ -102,9 +107,23 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--Date", help="Date")
     # parser.add_argument("-pd", "--PlotDaily", help="PlotDaily")
 
-    today_time = datetime.today().strftime('%Y-%m-%d')  
-    print(f"today_time: {today_time}")
+    # today_time = datetime.today().strftime('%Y-%m-%d')  
+    # print(f"today_time: {today_time}")
+    # daytime="2023-06-02"
+    # analysis_vol(daytime)
 
-    # today_time = "2023-06-06"
+    start_date = date(2023, 6, 2)
+    end_date = date(2023, 6, 8)
+    for single_date in daterange(start_date, end_date):
+        daytime = single_date.strftime("%Y-%m-%d")
+        print("daytime "+daytime)
+        weekno = single_date.weekday()
+        
+        if weekno < 5:
+            print("Today is a Weekday")
+            analysis_vol(daytime)
+        else:  
+            # 5 Sat, 6 Sun
+            print("Today is a Weekend")        
 
-    analysis_vol(today_time)
+    

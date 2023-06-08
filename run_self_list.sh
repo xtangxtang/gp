@@ -9,9 +9,6 @@
 # sleep 5
 # mv ShowReport.xlsx gp_list/sz.xlsx
 
-while true
-do
-    python3 get_trade_daily.py -m 1 -s 2
-done
+ python3 get_trade_daily.py -m 1 -s 2
 
 
