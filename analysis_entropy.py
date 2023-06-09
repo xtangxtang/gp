@@ -16,7 +16,7 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 # Customize matplotlib
 warnings.filterwarnings("ignore", message="Glyph 146 missing from current font.")
@@ -197,6 +197,10 @@ def analysis_entropy(today_time=""):
 #   # 展示热图
 #   plt.show()
 
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days)):
+        yield start_date + timedelta(n)
+
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("-d", "--Date", help="Date")
@@ -208,3 +212,17 @@ if __name__ == "__main__":
   today_time="2023-06-07"
   analysis_entropy(today_time)
   # draw_daily_line("sz002169","2023-06-02")
+
+  start_date = date(2023, 6, 2)
+  end_date = date(2023, 6, 9)
+  for single_date in daterange(start_date, end_date):
+      daytime = single_date.strftime("%Y-%m-%d")
+      print("daytime "+daytime)
+      weekno = single_date.weekday()
+      
+      if weekno < 5:
+          print("Today is a Weekday")
+          analysis_entropy(daytime)
+      else:  
+          # 5 Sat, 6 Sun
+          print("Today is a Weekend")   
