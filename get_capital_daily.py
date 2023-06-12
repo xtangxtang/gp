@@ -20,45 +20,105 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
+def get_daily3():
+    ua=UserAgent()
+    # print('User-Agent :' + ua.random)
+    hdr = {'User-Agent': ua.random,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'none',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Connection': 'keep-alive'} 
+    # url = "http://q.10jqka.com.cn/"                  
+    url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
+    html=requests.get(url, timeout=20, headers=hdr).content
+    df_tmp = pd.read_html(html)
+    print(df_tmp)
+
+    soup=BeautifulSoup(html,'html.parser')
+    next_link = soup.find("a", string="下一页")
+    print(next_link.get('href'))
+
+
+def get_daily2():
+    ua=UserAgent()
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    chrome_options.add_argument('User-Agent:' +  ua.random)
+    driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
+
+    url = 'https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0'
+    # url = "http://q.10jqka.com.cn/"   
+
+    # 打开网页
+    driver.get(url)
+
+    pages = driver.find_elements_by_xpath('//*[@id="pageList"]/div/ul/li[9]/a')
+    print("len(pages):" + str(len(pages)))
+    for i in range(len(pages)):
+        print(pages[i].get_attribute("id"))
+        try :
+            WebDriverWait(driver, 10).until(EC.staleness_of(pages[i]))
+            pages[i].click()
+
+            wait = WebDriverWait(driver, 10)
+            table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+            print(table)            
+        except:
+            print("could not click")
+            pass    
+
+    return
+
+    # 等待表格加载完成
+    wait = WebDriverWait(driver, 10)
+    table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+    print(table)
+
+    # 获取表格数据
+    html_content = table.get_attribute('outerHTML')
+    df = pd.read_html(html_content)[0]  # 假设表格是页面上的第一个表格
+    print(df)
+    print("--------------------------------------------")
+    alink = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pageList"]/div/ul/li[9]/a')))
+    print("alink " + str(alink.text))
+    WebDriverWait(driver, 10).until(EC.elemenet_to_be_clickable((By.XPATH, '//*[@id="pageList"]/div/ul/li[9]/a'))).click()
+    # next_page_link = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(),"下一页")]')))
+    # next_page_link.click()
+    wait.until(EC.staleness_of(table))  # 等待表格刷新
+    table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))    
+
+    # # 循环点击下一页直到没有下一页链接为止
+    # while True:
+    #     try:
+    #         next_page_link = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(),"下一页")]')))
+    #         next_page_link.click()
+    #         wait.until(EC.staleness_of(table))  # 等待表格刷新
+    #         table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+    #         html_content = table.get_attribute('outerHTML')
+    #         next_df = pd.read_html(html_content)[0]
+    #         df = pd.concat([df, next_df], ignore_index=True)
+    #     except Exception as e:
+    #         print(e)
+    #         break
+
+    # # 输出表格数据
+    # print(df)    
+
 def get_daily():
-    url = "http://data.eastmoney.com/zjlx/detail.html"
+    # url = "http://data.eastmoney.com/zjlx/detail.html"
+    # url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
+    url = "http://q.10jqka.com.cn/"
+
 
     chrome_options = Options()
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
-    driver.get(url)    
-
-    # //*[@id="dataview"]/div[2]/div[2]/table/tbody/tr[1]
-    # //*[@id="dataview"]/div[2]/div[2]/table
-    # /html/body/div[2]/div[8]/div[2]/div[6]/div[1]/div[2]/div[2]/table/tbody
-
-    # num_rows = len(driver.find_element_by_xpath("//*[@id='dataview']/table"))
-    # print(driver.find_element_by_xpath("//*[@id='dataview']/table/tbody"))
-    # print(driver.find_element_by_xpath("//*[@id='dataview']"))
-
-
-    # html=driver.page_source
-    # soup=BeautifulSoup(html,'html.parser')
-    # div=soup.select_one("div#pagerbox")    
-    # print(str(div))
-
-    # exit(0)
-    # while True:
-    #     try:
-    #         # //*[@id="dataview"]/div[3]/div[1]/a[9]
-    #         driver.execute_script("return arguments[0].scrollIntoView(true);", WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='dataview']/div[3]/div[1]/a[8]"))))
-    #         driver.find_element_by_xpath("//*[@id='dataview']/div[3]/div[1]/a[8]").click()
-    #         print("Navigating to Next Page")
-    #     except Exception as e :
-    #         print(e)
-    #         driver.execute_script("return arguments[0].scrollIntoView(true);", WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//*[@id='dataview']/div[3]/div[1]/a[9]")))) 
-    #         driver.find_element_by_xpath("//*[@id='dataview']/div[3]/div[1]/a[8]").click()
-    #         print("Navigating to Next Page")
-            
-    #         # print("Last page reached")
-    #         # break    
+    driver.get(url)  
 
     html=driver.page_source
     soup=BeautifulSoup(html,'html.parser')
@@ -67,9 +127,21 @@ def get_daily():
     print(table)
 
 
+    # for li in soup.find_all(class_="next"):
+    #     print(li.a.get('href'))
+
+    # from selenium.webdriver.common.by import By
+    # from selenium.webdriver.support import expected_conditions as EC
+    # from selenium.webdriver.support.ui import WebDriverWait as wait
+
+    # # driver.find_element_by_partial_link_text("下一页").click()
+    # print(EC.elemenet_to_be_clickable((By.XPATH, "//span[text()='下一页']")))
+    # wait(driver, 10).until(EC.elemenet_to_be_clickable((By.XPATH, "//span[text()='下一页']"))).click()
+
+
 if __name__ == "__main__":
 
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily()
+    get_daily2()

@@ -209,20 +209,20 @@ if __name__ == "__main__":
   today_time = datetime.today().strftime('%Y-%m-%d')  
   print(f"today_time: {today_time}")
 
-  today_time="2023-06-07"
-  analysis_entropy(today_time)
+  # today_time="2023-06-07"
+  analysis_entropy()
   # draw_daily_line("sz002169","2023-06-02")
 
-  start_date = date(2023, 6, 2)
-  end_date = date(2023, 6, 9)
-  for single_date in daterange(start_date, end_date):
-      daytime = single_date.strftime("%Y-%m-%d")
-      print("daytime "+daytime)
-      weekno = single_date.weekday()
+  # start_date = date(2023, 6, 2)
+  # end_date = date(2023, 6, 12)
+  # for single_date in daterange(start_date, end_date):
+  #     daytime = single_date.strftime("%Y-%m-%d")
+  #     print("daytime "+daytime)
+  #     weekno = single_date.weekday()
       
-      if weekno < 5:
-          print("Today is a Weekday")
-          analysis_entropy(daytime)
-      else:  
-          # 5 Sat, 6 Sun
-          print("Today is a Weekend")   
+  #     if weekno < 5:
+  #         print("Today is a Weekday")
+  #         analysis_entropy(daytime)
+  #     else:  
+  #         # 5 Sat, 6 Sun
+  #         print("Today is a Weekend")   
