@@ -19,6 +19,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
+from selenium.webdriver.chrome.service import Service
 
 def get_daily3():
     ua=UserAgent()
@@ -30,8 +31,9 @@ def get_daily3():
         'Accept-Language': 'en-US,en;q=0.8',
         'Connection': 'keep-alive'} 
     # url = "http://q.10jqka.com.cn/"                  
-    url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
-    html=requests.get(url, timeout=20, headers=hdr).content
+    # url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
+    url = "http://data.eastmoney.com/zjlx/detail.html"
+    html=requests.get(url, timeout=30, headers=hdr).content
     df_tmp = pd.read_html(html)
     print(df_tmp)
 
@@ -49,28 +51,37 @@ def get_daily2():
     chrome_options.add_argument('User-Agent:' +  ua.random)
     driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
 
+    # url = "http://data.eastmoney.com/zjlx/detail.html"
     url = 'https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0'
     # url = "http://q.10jqka.com.cn/"   
 
     # 打开网页
     driver.get(url)
+    wait = WebDriverWait(driver, 10)
+    table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+    print(table)
 
-    pages = driver.find_elements_by_xpath('//*[@id="pageList"]/div/ul/li[9]/a')
-    print("len(pages):" + str(len(pages)))
-    for i in range(len(pages)):
-        print(pages[i].get_attribute("id"))
-        try :
-            WebDriverWait(driver, 10).until(EC.staleness_of(pages[i]))
-            pages[i].click()
+    # 获取表格数据
+    html_content = table.get_attribute('outerHTML')
+    df = pd.read_html(html_content)[0]  # 假设表格是页面上的第一个表格
+    print(df)    
 
-            wait = WebDriverWait(driver, 10)
-            table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
-            print(table)            
-        except:
-            print("could not click")
-            pass    
+    # pages = driver.find_elements_by_xpath('//*[@id="pageList"]/div/ul/li[9]/a')
+    # print("len(pages):" + str(len(pages)))
+    # for i in range(len(pages)):
+    #     print(pages[i].get_attribute("id"))
+    #     try :
+    #         WebDriverWait(driver, 10).until(EC.staleness_of(pages[i]))
+    #         pages[i].click()
 
-    return
+    #         wait = WebDriverWait(driver, 10)
+    #         table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+    #         print(table)            
+    #     except:
+    #         print("could not click")
+    #         pass    
+
+    # return
 
     # 等待表格加载完成
     wait = WebDriverWait(driver, 10)
@@ -109,8 +120,8 @@ def get_daily2():
 
 def get_daily():
     # url = "http://data.eastmoney.com/zjlx/detail.html"
-    # url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
-    url = "http://q.10jqka.com.cn/"
+    url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
+    # url = "http://q.10jqka.com.cn/"
 
 
     chrome_options = Options()
@@ -120,23 +131,37 @@ def get_daily():
     driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
     driver.get(url)  
 
-    html=driver.page_source
-    soup=BeautifulSoup(html,'html.parser')
-    div=soup.find("table")
-    table=pd.read_html(str(div))
-    print(table)
+    # Find all of the rows in the table
+    rows = driver.find_elements(By.CSS_SELECTOR, 'table tr')
+    # For each row, find the cells and extract the text
+    for row in rows:
+        try:
+            cells = row.find_elements(By.CSS_SELECTOR, 'td') or row.find_elements(By.CSS_SELECTOR, 'th')
+        except:
+            continue
+        for cel in cells:
+            print(cel.text, end= ",")
+        print()
 
+    driver.find_element_by_xpath("//li[@class='next']").click()
+    # driver.execute_script("arguments[0].click();", nxt)
 
-    # for li in soup.find_all(class_="next"):
-    #     print(li.a.get('href'))
+    driver.implicitly_wait(30)
 
-    # from selenium.webdriver.common.by import By
-    # from selenium.webdriver.support import expected_conditions as EC
-    # from selenium.webdriver.support.ui import WebDriverWait as wait
+    # Find all of the rows in the table
+    rows = driver.find_elements(By.CSS_SELECTOR, 'table tr')
+    # For each row, find the cells and extract the text
+    for row in rows:
+        try:
+            cells = row.find_elements(By.CSS_SELECTOR, 'td') or row.find_elements(By.CSS_SELECTOR, 'th')
+        except:
+            continue
+        for cel in cells:
+            print(cel.text, end= ",")
+        print()    
 
-    # # driver.find_element_by_partial_link_text("下一页").click()
-    # print(EC.elemenet_to_be_clickable((By.XPATH, "//span[text()='下一页']")))
-    # wait(driver, 10).until(EC.elemenet_to_be_clickable((By.XPATH, "//span[text()='下一页']"))).click()
+    driver.quit()
+    
 
 
 if __name__ == "__main__":

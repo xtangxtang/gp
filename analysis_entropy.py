@@ -210,11 +210,11 @@ if __name__ == "__main__":
   print(f"today_time: {today_time}")
 
   # today_time="2023-06-07"
-  analysis_entropy()
+  analysis_entropy(today_time)
   # draw_daily_line("sz002169","2023-06-02")
 
   # start_date = date(2023, 6, 2)
-  # end_date = date(2023, 6, 12)
+  # end_date = date(2023, 6, 13)
   # for single_date in daterange(start_date, end_date):
   #     daytime = single_date.strftime("%Y-%m-%d")
   #     print("daytime "+daytime)
