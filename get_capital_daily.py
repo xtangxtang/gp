@@ -20,7 +20,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 from selenium.webdriver.chrome.service import Service
-import scrapy
+import mechanize
+from lxml.etree import fromstring
+import json
+
 
 def get_daily3():
     ua=UserAgent()
@@ -52,20 +55,20 @@ def get_daily2():
     chrome_options.add_argument('User-Agent:' +  ua.random)
     driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
 
-    # url = "http://data.eastmoney.com/zjlx/detail.html"
-    url = 'https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0'
+    url = "http://data.eastmoney.com/zjlx/detail.html"
+    # url = 'https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0'
     # url = "http://q.10jqka.com.cn/"   
 
     # 打开网页
-    driver.get(url)
-    wait = WebDriverWait(driver, 10)
-    table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
-    print(table)
+    # driver.get(url)
+    # wait = WebDriverWait(driver, 10)
+    # table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))
+    # print(table)
 
     # 获取表格数据
     html_content = table.get_attribute('outerHTML')
     df = pd.read_html(html_content)[0]  # 假设表格是页面上的第一个表格
-    print(df)    
+    # print(df)    
 
     # pages = driver.find_elements_by_xpath('//*[@id="pageList"]/div/ul/li[9]/a')
     # print("len(pages):" + str(len(pages)))
@@ -94,11 +97,12 @@ def get_daily2():
     df = pd.read_html(html_content)[0]  # 假设表格是页面上的第一个表格
     print(df)
     print("--------------------------------------------")
-    alink = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pageList"]/div/ul/li[9]/a')))
-    print("alink " + str(alink.text))
-    WebDriverWait(driver, 10).until(EC.elemenet_to_be_clickable((By.XPATH, '//*[@id="pageList"]/div/ul/li[9]/a'))).click()
-    # next_page_link = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(),"下一页")]')))
-    # next_page_link.click()
+    # alink = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pageList"]/div/ul/li[9]/a')))
+    # print("alink " + str(alink.text))
+    # click = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[8]/div[2]/div[6]/div[1]/div[3]/div[1]/a[11]')))
+    # print("click")
+    next_page_link = wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(),"下一页")]')))
+    next_page_link.click()
     wait.until(EC.staleness_of(table))  # 等待表格刷新
     table = wait.until(EC.presence_of_element_located((By.XPATH, '//table')))    
 
@@ -121,47 +125,39 @@ def get_daily2():
 
 def get_daily():
     # url = "http://data.eastmoney.com/zjlx/detail.html"
-    url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
+    # url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
     # url = "http://q.10jqka.com.cn/"
 
+    pagenum=1
+    url = f"http://push2.eastmoney.com/api/qt/clist/get?cb=jQuery11230782769932894602_1686965932465&fid=f62&po=1&pz=50&pn={pagenum}&np=1&fltt=2&invt=2&ut=b2884a393a59ad64002292a3e90d46a5&fs=m%3A0%2Bt%3A6%2Bf%3A!2%2Cm%3A0%2Bt%3A13%2Bf%3A!2%2Cm%3A0%2Bt%3A80%2Bf%3A!2%2Cm%3A1%2Bt%3A2%2Bf%3A!2%2Cm%3A1%2Bt%3A23%2Bf%3A!2%2Cm%3A0%2Bt%3A7%2Bf%3A!2%2Cm%3A1%2Bt%3A3%2Bf%3A!2&fields=f12%2Cf14%2Cf2%2Cf3%2Cf62%2Cf184%2Cf66%2Cf69%2Cf72%2Cf75%2Cf78%2Cf81%2Cf84%2Cf87%2Cf204%2Cf205%2Cf124%2Cf1%2Cf13"
+    ua=UserAgent()
+    # print('User-Agent :' + ua.random)
+    hdr = {'User-Agent': ua.random,
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+        'Accept-Encoding': 'none',
+        'Accept-Language': 'en-US,en;q=0.8',
+        'Connection': 'keep-alive'}                    
+    html_json=requests.get(url, timeout=20, headers=hdr).content
+    html_json = str(html_json,encoding="utf8")
+    # print(html)
+    # html_json = "xxxx[符号之前的所有字符去掉"
+    index = html_json.find('[')  # 查找 '[' 符号的索引位置
+    if index != -1:
+        html_json = html_json[index:]  # 获取 '[' 之后的所有字符
+    else:
+        html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串
 
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    driver = webdriver.Chrome('/mnt/nvme0n1/chromedriver',chrome_options=chrome_options)
-    driver.get(url)  
+    index = html_json.find(']')  # 查找 '[' 符号的索引位置
+    if index != -1:
+        html_json = html_json[:index+1]  # 获取 '[' 之后的所有字符
+    else:
+        html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串        
+    print(html_json)    
+    table = pd.read_json(html_json)
+    print(table)
 
-    # Find all of the rows in the table
-    rows = driver.find_elements(By.CSS_SELECTOR, 'table tr')
-    # For each row, find the cells and extract the text
-    for row in rows:
-        try:
-            cells = row.find_elements(By.CSS_SELECTOR, 'td') or row.find_elements(By.CSS_SELECTOR, 'th')
-        except:
-            continue
-        for cel in cells:
-            print(cel.text, end= ",")
-        print()
 
-    driver.find_element_by_xpath("//li[@class='next']").click()
-    # driver.execute_script("arguments[0].click();", nxt)
-
-    driver.implicitly_wait(30)
-
-    # Find all of the rows in the table
-    rows = driver.find_elements(By.CSS_SELECTOR, 'table tr')
-    # For each row, find the cells and extract the text
-    for row in rows:
-        try:
-            cells = row.find_elements(By.CSS_SELECTOR, 'td') or row.find_elements(By.CSS_SELECTOR, 'th')
-        except:
-            continue
-        for cel in cells:
-            print(cel.text, end= ",")
-        print()    
-
-    driver.quit()
     
 
 
@@ -170,4 +166,4 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily2()
+    get_daily()
