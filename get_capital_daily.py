@@ -50,7 +50,7 @@ def get_daily_gg(working_path):
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
-    csv_file = f"{working_path}/capital/{today_time}-gg.csv"
+    csv_file = f"{working_path}/capital/gg/{today_time}-gg.csv"
     if os.path.exists(csv_file):
         os.remove(csv_file)
     
@@ -120,7 +120,7 @@ def get_daily_bk(working_path):
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
-    csv_file = f"{working_path}/capital/{today_time}-bk.csv"
+    csv_file = f"{working_path}/capital/bk/{today_time}-bk.csv"
     if os.path.exists(csv_file):
         os.remove(csv_file)
     
@@ -185,7 +185,7 @@ def get_daily_gn(working_path):
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
-    csv_file = f"{working_path}/capital/{today_time}-gn.csv"
+    csv_file = f"{working_path}/capital/gn/{today_time}-gn.csv"
     if os.path.exists(csv_file):
         os.remove(csv_file)
     
@@ -242,6 +242,6 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    # get_daily_gg(os.getcwd())
-    # get_daily_bk(os.getcwd())
-    get_daily_gn(os.getcwd())
+    get_daily_gg(working_path)
+    get_daily_bk(working_path)
+    get_daily_gn(working_path)
