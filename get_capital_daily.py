@@ -23,6 +23,7 @@ from selenium.webdriver.chrome.service import Service
 import mechanize
 from lxml.etree import fromstring
 import json
+import re
 
       
 # 添加前缀的函数
@@ -33,8 +34,20 @@ def add_prefix(column):
         return 'sz' + column
     else:
         return column
+    
+def convert_chinese_number(value):
+    pattern = r'([\d.]+)(亿|万)'
+    match = re.search(pattern, value)
+    if match:
+        number = float(match.group(1))
+        unit = match.group(2)
+        if unit == '亿':
+            return number * 100000000  # 亿对应的数值
+        elif unit == '万':
+            return number * 10000  # 万对应的数值
+    return float(value)  # 转换为浮点型   
 
-## 获得个股资金
+## 获得个股主力资金
 def get_daily_gg(working_path):
     # url = "http://data.eastmoney.com/zjlx/detail.html"
     # url = "https://xueqiu.com/hq#exchange=CN&firstName=1&secondName=1_0"
@@ -108,7 +121,7 @@ def get_daily_gg(working_path):
     captial_df.reset_index()
     captial_df.to_csv(csv_file, encoding="utf-8")
 
-## 获得板块资金
+## 获得板块主力资金
 def get_daily_bk(working_path):
     os.chdir(working_path)
     print("working_path " + working_path)
@@ -173,7 +186,7 @@ def get_daily_bk(working_path):
     captial_df.reset_index()
     captial_df.to_csv(csv_file, encoding="utf-8")    
 
-## 获得概念资金
+## 获得概念主力资金
 def get_daily_gn(working_path):
     os.chdir(working_path)
     print("working_path " + working_path)
@@ -237,6 +250,64 @@ def get_daily_gn(working_path):
     captial_df.reset_index()
     captial_df.to_csv(csv_file, encoding="utf-8")    
 
+## 获得个股资金流入和流出
+def get_daily_gg2(working_path):
+    os.chdir(working_path)
+    print("working_path " + working_path)
+    os.chdir(working_path + "/capital")
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today_time = datetime.today().strftime('%Y-%m-%d')  
+
+    captial_df = pd.DataFrame()
+    csv_file = f"{working_path}/capital/gg2/{today_time}-gg2.csv"
+    if os.path.exists(csv_file):
+        os.remove(csv_file)
+    
+    page_range = range(1, 101)
+    for pagenum in page_range:
+        url = f"http://data.10jqka.com.cn/funds/ggzjl/field/zdf/order/desc/page/{pagenum}/ajax/1/free/1/"
+        from pyvirtualdisplay import Display
+        from pyvirtualdisplay.xephyr import XephyrDisplay 
+        display = Display(visible=0, size=(1920, 1080)) 
+        # display = XephyrDisplay() 
+        display.start()
+        ua = UserAgent()
+        userAgent = ua.chrome
+        chrome_options = Options()
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument(f'user-agent={userAgent}')
+        driver = webdriver.Chrome ('/usr/bin/chromedriver',options = chrome_options)
+        driver.get(url)         
+
+        html = driver.page_source
+        time.sleep(2)
+        table = pd.read_html(html)[0]
+        table = table.astype({"股票代码": str})
+
+        # 对索引列应用函数
+        table['股票代码'] = table['股票代码'].str.zfill(6)     
+        table['股票代码'] = table['股票代码'].apply(add_prefix)
+
+        table = table.drop(columns=['序号'])
+        table.rename(columns={"股票代码": "代码"}, inplace=True)
+        table.set_index('代码',inplace=True)   
+
+        columns_to_convert = ['流入资金(元)', '流出资金(元)', '净额(元)', '成交额(元)']
+        table[columns_to_convert] = table[columns_to_convert].applymap(convert_chinese_number)       
+
+        captial_df = pd.concat([captial_df,table]).drop_duplicates()      
+        print(captial_df.last)
+        
+    captial_df.to_csv(csv_file, encoding="utf-8")    
+    print(captial_df)
+
+
 if __name__ == "__main__":
 
     chunks_num =5
@@ -245,3 +316,5 @@ if __name__ == "__main__":
     get_daily_gg(working_path)
     get_daily_bk(working_path)
     get_daily_gn(working_path)
+    get_daily_gg2(working_path)
+
