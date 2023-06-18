@@ -307,14 +307,73 @@ def get_daily_gg2(working_path):
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
 
+## 获得个股融资融券
+def get_daily_rzrq(working_path):
+    os.chdir(working_path)
+    print("working_path " + working_path)
+    os.chdir(working_path + "/capital")
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today_time = datetime.today().strftime('%Y-%m-%d')  
+
+    captial_df = pd.DataFrame()
+    csv_file = f"{working_path}/capital/rzrq/{today_time}-rzrq.csv"
+    if os.path.exists(csv_file):
+        os.remove(csv_file)
+    
+    page_range = range(1, 35)
+    for pagenum in page_range:
+        url = f"http://data.10jqka.com.cn/market/rzrq/board/ls/field/rzjmr/order/desc/page/{pagenum}/ajax/1/"
+        from pyvirtualdisplay import Display
+        from pyvirtualdisplay.xephyr import XephyrDisplay 
+        display = Display(visible=0, size=(1920, 1080)) 
+        # display = XephyrDisplay() 
+        display.start()
+        ua = UserAgent()
+        userAgent = ua.chrome
+        chrome_options = Options()
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument(f'user-agent={userAgent}')
+        driver = webdriver.Chrome ('/usr/bin/chromedriver',options = chrome_options)
+        driver.get(url)         
+
+        html = driver.page_source
+        time.sleep(2)
+        table = pd.read_html(html)[0]
+        column_names=['序号', '代码', '股票名称', '融资余额', '融资买入额', '融资偿还额', '融资净买入', '余量', '卖出量', '偿还量', '融券净卖出', '融资融券余额(元)', '历史']
+        table.columns=column_names
+        table = table.drop(columns=['序号', '余量', '卖出量', '偿还量', '融券净卖出','历史'])
+        table = table.astype({"代码": str})
+        table['代码'] = table['代码'].str.zfill(6)     
+        table['代码'] = table['代码'].apply(add_prefix)        
+        print(table)
+ 
+        table.set_index('代码',inplace=True)   
+
+        columns_to_convert = ['融资余额', '融资买入额', '融资偿还额', '融资净买入', '融资融券余额(元)']
+        table[columns_to_convert] = table[columns_to_convert].applymap(convert_chinese_number)       
+
+        captial_df = pd.concat([captial_df,table]).drop_duplicates()      
+        print(captial_df.last)
+        
+    captial_df.to_csv(csv_file, encoding="utf-8")    
+    print(captial_df)
 
 if __name__ == "__main__":
 
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily_gg(working_path)
-    get_daily_bk(working_path)
-    get_daily_gn(working_path)
-    get_daily_gg2(working_path)
+    # get_daily_gg(working_path)
+    # get_daily_bk(working_path)
+    # get_daily_gn(working_path)
+    # get_daily_gg2(working_path)
+    get_daily_rzrq(working_path)
+
+    
 
