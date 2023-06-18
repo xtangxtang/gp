@@ -1,0 +1,1 @@
+python3 get_capital_daily.py
