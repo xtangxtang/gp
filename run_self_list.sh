@@ -9,6 +9,6 @@
 # sleep 5
 # mv ShowReport.xlsx gp_list/sz.xlsx
 
- python3 get_trade_daily.py -m 1 -s 2
+ python3 get_selflist_daily.py -m 1 -s 2
 
 

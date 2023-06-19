@@ -303,6 +303,7 @@ def get_daily_gg2(working_path):
 
         captial_df = pd.concat([captial_df,table]).drop_duplicates()      
         print(captial_df.last)
+        driver.close()
         
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
@@ -360,6 +361,7 @@ def get_daily_rzrq(working_path):
 
         captial_df = pd.concat([captial_df,table]).drop_duplicates()      
         print(captial_df.last)
+        driver.close()
         
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
@@ -369,10 +371,10 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    # get_daily_gg(working_path)
-    # get_daily_bk(working_path)
-    # get_daily_gn(working_path)
-    # get_daily_gg2(working_path)
+    get_daily_gg(working_path)
+    get_daily_bk(working_path)
+    get_daily_gn(working_path)
+    get_daily_gg2(working_path)
     get_daily_rzrq(working_path)
 
     
