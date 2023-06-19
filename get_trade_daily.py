@@ -64,7 +64,7 @@ def get_daily(working_path):
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
-    csv_file = f"{working_path}/capital/all/{today_time}-alldaily.csv"
+    csv_file = f"{working_path}/gp_daily/all/{today_time}-alldaily.csv"
     if os.path.exists(csv_file):
         os.remove(csv_file)
     
@@ -104,6 +104,7 @@ def get_daily(working_path):
         captial_df = pd.concat([captial_df,table]).drop_duplicates()      
         print(captial_df.last)
         driver.close()
+        display.stop()
         
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
