@@ -1,0 +1,1 @@
+python3 get_trade_daily.py
