@@ -66,7 +66,8 @@ def get_daily(working_path):
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/gp_daily/all/{today_time}-alldaily.csv"
     if os.path.exists(csv_file):
-        os.remove(csv_file)
+        print(f"{csv_file} exist, return")
+        return
     
     page_range = range(1, 260)
     for pagenum in page_range:
