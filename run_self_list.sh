@@ -1,5 +1,10 @@
 #!/bin/sh -e
 
+if [[ $(date +%u) -gt 5 ]]; then
+    echo 'Sorry, you cannot run this program on the weekend.'
+    exit
+fi
+
 # rm -rf gp_list/*.xls
 # rm -rf gp_list/*.xlsx
 
