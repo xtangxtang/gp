@@ -163,7 +163,7 @@ if __name__ == "__main__":
                     "sz300001", "sz159740"]
     
     # chunks_num =5
-    remove_files_not_self_list(self_gplist)
+    # remove_files_not_self_list(self_gplist)
 
     today_time = ""
     self_gplist_cks = list(divide_chunks(self_gplist, int(len(self_gplist)/chunks_num)))
