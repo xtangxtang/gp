@@ -16,4 +16,4 @@ RUN pip install requests_html
 RUN pip install mechanize
 RUN pip install pyvirtualdisplay
 RUN pip install xvfbwrapper
-apt-get install -y xvfb
+RUN apt-get install -y xvfb
