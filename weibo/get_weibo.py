@@ -431,7 +431,7 @@ class WeiboUserScrapy():
         df.drop(df[df['publish_time'].isin(['publish_time'])].index, inplace=True)
         # print(df.shape[0])
         df.sort_values(by=['publish_time'], ascending=False, inplace=True)
-        df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        df.to_csv(file_path, index=False, encoding='utf-8')
 
     def write_csv(self, wrote_num):
         """将爬取的信息写入csv文件"""
@@ -453,8 +453,8 @@ class WeiboUserScrapy():
                 result_headers.insert(5, 'is_origin')
             result_data = [w.values() for w in self.weibo][wrote_num:]
             self.file_path = './user/{}_{}.csv'.format(self.user_id, self.nickname)
-            # with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format_excc(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8-sig',newline='') as f:
-            with open(self.file_path, 'a', encoding='utf-8-sig', newline='') as f:
+            # with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format_excc(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8',newline='') as f:
+            with open(self.file_path, 'a', encoding='utf-8', newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
@@ -483,10 +483,10 @@ class WeiboUserScrapy():
             user_page_config = 'user_page.json'
             if not os.path.exists('user_page.json'):
                 page = 1
-                with open(user_page_config, 'w', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'w', encoding='utf-8') as f:
                     f.write(json.dumps({f'{self.user_id}': page}, indent=2))
             else:
-                with open(user_page_config, 'r', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'r', encoding='utf-8') as f:
                     raw_json = json.loads(f.read())
                     if self.user_id in raw_json.keys():
                         page = raw_json[self.user_id]
@@ -497,11 +497,11 @@ class WeiboUserScrapy():
             for page in range(page, page_num + 1):
                 ret = self.get_one_page(page)  # 获取第page页的全部微博
 
-                with open(user_page_config, 'r', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'r', encoding='utf-8') as f:
                     old_data = json.loads(f.read())
                     old_data[f'{self.user_id}'] = page
 
-                with open(user_page_config, 'w', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'w', encoding='utf-8') as f:
                     f.write(json.dumps(old_data, indent=2))
 
                 if page % 3 == 0:  # 每爬3页写入一次文件
@@ -582,7 +582,7 @@ class WeiboUserScrapy():
 def scrape_wu2198():
     WeiboUserScrapy(user_id=7751678845, filter=0, download_img=False)
 
-    table = pd.read_csv("user/7751678845_广西小wu.csv", encoding='utf-8-sig')
+    table = pd.read_csv("user/7751678845_广西小wu.csv", encoding='utf-8')
     table = table.drop(columns=['weibo_link', 'img_urls', 'origin_img_urls', 'is_origin',
                                 'location', 'publish_tool', 'like_num', 'forward_num', 'comment_num'])
     column_names=['微博id','微博内容','微博发布时间']
@@ -593,15 +593,15 @@ def scrape_wu2198():
     if os.path.exists(wu2198_csv):
         wu2198_table = pd.read_csv(wu2198_csv)
     wu2198_table.set_index('微博id',inplace=True)
-    wu2198_table = pd.concat([wu2198_table,table]).drop_duplicates()
+    wu2198_table = pd.concat([table, wu2198_table]).drop_duplicates()
     print(wu2198_table)
        
-    wu2198_table.to_csv(wu2198_csv, encoding='utf-8-sig')    
+    wu2198_table.to_csv(wu2198_csv, encoding='utf-8')    
 
 def scrape_tszrsmq():
     WeiboUserScrapy(user_id=2014433131, filter=0, download_img=False)
     if os.path.exists("user/2014433131_唐史主任司马迁.csv"):
-        table = pd.read_csv("user/2014433131_唐史主任司马迁.csv", encoding='utf-8-sig')
+        table = pd.read_csv("user/2014433131_唐史主任司马迁.csv", encoding='utf-8')
         table = table.drop(columns=['weibo_link', 'img_urls', 'origin_img_urls', 'is_origin',
                                 'location', 'publish_tool', 'like_num', 'forward_num', 'comment_num'])
     column_names=['微博id','微博内容','微博发布时间']
@@ -612,10 +612,10 @@ def scrape_tszrsmq():
     if os.path.exists(tszrsmq_csv):
         wu2198_table = pd.read_csv(tszrsmq_csv)
     tszrsmq_table.set_index('微博id',inplace=True)
-    tszrsmq_table = pd.concat([tszrsmq_table,table]).drop_duplicates()
+    tszrsmq_table = pd.concat([table, tszrsmq_table]).drop_duplicates()
     print(tszrsmq_table)
        
-    tszrsmq_table.to_csv(tszrsmq_csv, encoding='utf-8-sig')        
+    tszrsmq_table.to_csv(tszrsmq_csv, encoding='utf-8')        
 
 if __name__ == '__main__':
     # 注意关闭 vpn，注意配置代码第 29 行处的 cookie
@@ -631,13 +631,14 @@ if __name__ == '__main__':
     user_ = args.User
     print(f"scrape {user_}")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    endtime = datetime.today().strftime('%Y-%m-%d')
-    endtime = endtime + " 00:00"  
-    print(f"endtime: {endtime}")    
-    # endtime="2023-01-01 00:00"
+    # now = datetime.now()
+    # current_time = now.strftime("%H:%M:%S")
+    # print("Current Time =", current_time)
+    # endtime = datetime.today().strftime('%Y-%m-%d')
+    # endtime = endtime + " 00:00"  
+    
+    endtime="2023-01-01 00:00"
+    print(f"endtime: {endtime}") 
 
     if user_ == "wu2198":
         scrape_wu2198()

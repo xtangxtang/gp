@@ -4,9 +4,9 @@ if [[ $(date +%u) -gt 5 ]]; then
 fi
 
 ./run_get_capital.sh
-./run_self_list.sh
 ./run_get_trade_daily.sh
+./run_self_list.sh
 
-git add .
-git commit -m "update"
-git push
+# git add .
+# git commit -m "update"
+# git push

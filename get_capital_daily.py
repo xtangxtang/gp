@@ -250,6 +250,169 @@ def get_daily_gn(working_path):
     captial_df.reset_index()
     captial_df.to_csv(csv_file, encoding="utf-8")    
 
+def get_all_captial(working_path):
+    os.chdir(working_path)
+    print("working_path " + working_path)
+    os.chdir(working_path + "/capital")   
+
+    colnames=["日期", "上证收盘价", "上证涨跌幅", "深证收盘价", "深证涨跌幅", "主力净流入净额", "主力净流入净占比", 
+                "超大单净流入净额", "超大单净流入净占比", "大单净流入净额", "大单净流入净占比", "中单净流入净额", "中单净流入净占比", 
+                "小单净流入净额", "小单净流入净占比"]    
+
+    url = f"http://data.eastmoney.com/zjlx/dpzjlx.html"
+    from pyvirtualdisplay import Display
+    from pyvirtualdisplay.xephyr import XephyrDisplay 
+    display = Display(visible=0, size=(1920, 1080)) 
+    # display = XephyrDisplay() 
+    display.start()
+    ua = UserAgent()
+    userAgent = ua.chrome
+    chrome_options = Options()
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option('useAutomationExtension', False)
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument(f'user-agent={userAgent}')
+    driver = webdriver.Chrome ('/usr/bin/chromedriver',options = chrome_options)
+    driver.get(url)         
+
+    html = driver.page_source
+    # print(pd.read_html(html))
+    time.sleep(5)
+    # table = pd.read_html(html)[0]
+    # print(table) 
+    # table = pd.read_html(html)[1]
+    # print(table)   
+    table = pd.read_html(html)[2]    
+    table.columns=colnames
+    table.set_index(["日期"], inplace=True)
+
+    csv_file = f"{working_path}/capital/all/all-capital.csv"
+    if os.path.exists(csv_file):
+        captial_df = pd.read_csv(csv_file, index_col="日期")
+        captial_df = pd.concat([table, captial_df]).drop_duplicates()          
+    else:
+        captial_df = table
+    
+    print(captial_df)
+    captial_df.to_csv(csv_file, encoding="utf-8")
+    driver.close()
+
+def get_north_hy_capital(working_path):
+    os.chdir(working_path)
+    print("working_path " + working_path)
+    os.chdir(working_path + "/capital")
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today_time = datetime.today().strftime('%Y-%m-%d')  
+
+    captial_df = pd.DataFrame()
+    csv_file = f"{working_path}/capital/north/{today_time}-north-hy.csv"
+    if os.path.exists(csv_file):
+        os.remove(csv_file)
+
+    page_range = range(1, 3)
+    for pagenum in page_range:
+        url = f"https://datacenter-web.eastmoney.com/api/data/v1/get?callback=jQuery112308415029166620654_1687959194413&sortColumns=ADD_MARKET_CAP&sortTypes=-1&pageSize=50&pageNumber={pagenum}&reportName=RPT_MUTUAL_BOARD_HOLDRANK_WEB&columns=ALL&quoteColumns=f3~05~SECURITY_CODE~INDEX_CHANGE_RATIO&quoteType=0&source=WEB&client=WEB&filter=(BOARD_TYPE%3D%225%22)(TRADE_DATE%3D%272023-06-27%27)(INTERVAL_TYPE%3D%221%22)"
+        ua=UserAgent()
+        # print('User-Agent :' + ua.random)
+        hdr = {'User-Agent': ua.random,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+            'Accept-Encoding': 'none',
+            'Accept-Language': 'en-US,en;q=0.8',
+            'Connection': 'keep-alive'}                    
+        html_json=requests.get(url, timeout=20, headers=hdr).content
+        html_json = str(html_json,encoding="utf8")
+        # print(html)
+        # html_json = "xxxx[符号之前的所有字符去掉"
+        index = html_json.find('[')  # 查找 '[' 符号的索引位置
+        if index != -1:
+            html_json = html_json[index:]  # 获取 '[' 之后的所有字符
+        else:
+            html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串
+
+        index = html_json.find(']')  # 查找 '[' 符号的索引位置
+        if index != -1:
+            html_json = html_json[:index+1]  # 获取 '[' 之后的所有字符
+        else:
+            html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串        
+        # print(html_json)    
+        table = pd.read_json(html_json)
+        table = table.drop(columns=['BOARD_INNER_CODE','BOARD_TYPE', 'ORIG_BOARD_CODE','INTERVAL_TYPE'])
+        # table.set_index("BOARD_CODE")
+        # table.set_index('f12',inplace=True)
+        # table.index.name = '代码'
+        column_names=['行业代码','行业名称','涨跌幅%']
+        table.columns=column_names
+        new_cols = ['名称','最新价','今日涨跌幅','今日主力净流入(净额)','今日主力净流入(净占比)','今日超大单净流入(净额)',
+                        '今日超大单净流入(净占比)','今日大单净流入(净额)','今日大单净流入(净占比)',
+                        '今日中单净流入(净额)', '今日中单净流入(净占比)','今日小单净流入(净额)','今日小单净流入(净占比)']
+        table=table[new_cols]
+        captial_df = pd.concat([captial_df, table]).drop_duplicates()
+
+        print(captial_df.last)
+    # captial_df.index = captial_df.index.astype("str")
+    # captial_df.index = captial_df['代码'].astype('str')
+    # captial_df.reset_index()
+    captial_df.to_csv(csv_file, encoding="utf-8", index="BOARD_CODE")        
+
+# def get_north_hy_captial(working_path):
+#     os.chdir(working_path)
+#     print("working_path " + working_path)
+#     os.chdir(working_path + "/capital")   
+
+#     # colnames=["日期", "上证收盘价", "上证涨跌幅", "深证收盘价", "深证涨跌幅", "主力净流入净额", "主力净流入净占比", 
+#     #             "超大单净流入净额", "超大单净流入净占比", "大单净流入净额", "大单净流入净占比", "中单净流入净额", "中单净流入净占比", 
+#     #             "小单净流入净额", "小单净流入净占比"]    
+
+#     url = f"https://data.eastmoney.com/hsgtcg/hy.html"
+#     from pyvirtualdisplay import Display
+#     from pyvirtualdisplay.xephyr import XephyrDisplay 
+#     display = Display(visible=0, size=(1920, 1080)) 
+#     # display = XephyrDisplay() 
+#     display.start()
+#     ua = UserAgent()
+#     userAgent = ua.chrome
+#     chrome_options = Options()
+#     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+#     chrome_options.add_experimental_option('useAutomationExtension', False)
+#     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+#     chrome_options.add_argument('--no-sandbox')
+#     chrome_options.add_argument(f'user-agent={userAgent}')
+#     driver = webdriver.Chrome ('/usr/bin/chromedriver',options = chrome_options)
+#     driver.get(url)         
+
+#     html = driver.page_source
+#     # print(pd.read_html(html))
+#     # print("---------------------------------------------------------------")
+#     # time.sleep(5)
+#     # table = pd.read_html(html)[0]
+#     # print("---------------------------------------------------------------")
+#     # print(table) 
+#     # table = pd.read_html(html)[1]
+#     # print("---------------------------------------------------------------")
+#     # print(table)   
+#     table1 = pd.read_html(html)[1]    
+#     print(table1)
+#     return 
+#     # table.columns=colnames
+#     table.set_index(["日期"], inplace=True)
+
+#     csv_file = f"{working_path}/capital/all/all-capital.csv"
+#     if os.path.exists(csv_file):
+#         captial_df = pd.read_csv(csv_file, index_col="日期")
+#         captial_df = pd.concat([table, captial_df]).drop_duplicates()          
+#     else:
+#         captial_df = table
+    
+#     print(captial_df)
+#     captial_df.to_csv(csv_file, encoding="utf-8")
+#     driver.close()    
+
+
 ## 获得个股资金流入和流出
 def get_daily_gg2(working_path):
     os.chdir(working_path)
@@ -371,11 +534,12 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily_gg(working_path)
-    get_daily_bk(working_path)
-    get_daily_gn(working_path)
-    get_daily_gg2(working_path)
-    get_daily_rzrq(working_path)
-
+    # get_daily_gg(working_path)
+    # get_daily_bk(working_path)
+    # get_daily_gn(working_path)
+    # get_daily_gg2(working_path)
+    # get_daily_rzrq(working_path)
+    # get_all_captial(working_path)
     
+    get_north_hy_capital(working_path)
 
