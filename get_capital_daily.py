@@ -303,19 +303,20 @@ def get_north_hy_capital(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    # now = datetime.now()
+    # current_time = now.strftime("%H:%M:%S")
+    # print("Current Time =", current_time)
+    # date_time = datetime.today().strftime('%Y-%m-%d')
+    date_time = "2023-06-25"
 
     captial_df = pd.DataFrame()
-    csv_file = f"{working_path}/capital/north/{today_time}-north-hy.csv"
+    csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"
     if os.path.exists(csv_file):
         os.remove(csv_file)
 
     page_range = range(1, 3)
     for pagenum in page_range:
-        url = f"https://datacenter-web.eastmoney.com/api/data/v1/get?callback=jQuery112308415029166620654_1687959194413&sortColumns=ADD_MARKET_CAP&sortTypes=-1&pageSize=50&pageNumber={pagenum}&reportName=RPT_MUTUAL_BOARD_HOLDRANK_WEB&columns=ALL&quoteColumns=f3~05~SECURITY_CODE~INDEX_CHANGE_RATIO&quoteType=0&source=WEB&client=WEB&filter=(BOARD_TYPE%3D%225%22)(TRADE_DATE%3D%272023-06-27%27)(INTERVAL_TYPE%3D%221%22)"
+        url = f"https://datacenter-web.eastmoney.com/api/data/v1/get?callback=jQuery112308415029166620654_1687959194413&sortColumns=ADD_MARKET_CAP&sortTypes=-1&pageSize=50&pageNumber={pagenum}&reportName=RPT_MUTUAL_BOARD_HOLDRANK_WEB&columns=ALL&quoteColumns=f3~05~SECURITY_CODE~INDEX_CHANGE_RATIO&quoteType=0&source=WEB&client=WEB&filter=(BOARD_TYPE%3D%225%22)(TRADE_DATE%3D%27{date_time}%27)(INTERVAL_TYPE%3D%221%22)"
         ua=UserAgent()
         # print('User-Agent :' + ua.random)
         hdr = {'User-Agent': ua.random,
@@ -341,23 +342,58 @@ def get_north_hy_capital(working_path):
             html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串        
         # print(html_json)    
         table = pd.read_json(html_json)
-        table = table.drop(columns=['BOARD_INNER_CODE','BOARD_TYPE', 'ORIG_BOARD_CODE','INTERVAL_TYPE'])
-        # table.set_index("BOARD_CODE")
-        # table.set_index('f12',inplace=True)
-        # table.index.name = '代码'
-        column_names=['行业代码','行业名称','涨跌幅%']
+        table = table.drop(columns=['BOARD_INNER_CODE',
+                                    'BOARD_TYPE', 
+                                    'ORIG_BOARD_CODE',
+                                    'INTERVAL_TYPE',
+                                    'MAXADD_SECUCODE',
+                                    'MINADD_SECUCODE',
+                                    'MAXADD_RATIO_SECUCODE',
+                                    'MINADD_RATIO_SECUCODE',
+                                    'IS_NEW',
+                                    'SECURITY_CODE',
+                                    'MAXHOLD_MARKETCAP_NAME',
+                                    'MAXHOLD_MARKETCAP_SECUCODE'
+                                    ])        
+        # table.set_index('f12',inplace=True)        
+        column_names=['行业代码',
+                      '行业名称',
+                      '涨跌幅%',
+                      '日期',
+                      '北向资金今日新增持股个数',
+                      '北向资金今日总持股个数',
+                      '北向资金今日新增市值',
+                      '北向资金今日新增市值增幅%',
+                      '行业总市值',
+                      '北向资金今日买入该行业占今日行业资金比',
+                      '北向资金今日买入该行业占北向资金比',
+                      '北向累计今日总买入市值',
+                      '北向累计今日总买入市值占累计北向资金比',
+                      '北向累计今日总持股市值占板块市值比',
+                      '北向今日增持最大市值股代码',
+                      '北向今日增持最大市值股名称',
+                      '北向今日减持最大市值股代码',
+                      '北向今日减持最大市值股名称',
+                      '北向今日增持最大比例股名称',
+                      '北向今日增持最大比例股代码',
+                      '北向今日减持最大比例股代码',
+                      '北向今日减持最大比例股名称',
+                      '北向累计持股市值最大股代码',]
         table.columns=column_names
-        new_cols = ['名称','最新价','今日涨跌幅','今日主力净流入(净额)','今日主力净流入(净占比)','今日超大单净流入(净额)',
-                        '今日超大单净流入(净占比)','今日大单净流入(净额)','今日大单净流入(净占比)',
-                        '今日中单净流入(净额)', '今日中单净流入(净占比)','今日小单净流入(净额)','今日小单净流入(净占比)']
-        table=table[new_cols]
+        table.set_index("行业代码", inplace=True)
+        # new_cols = ['名称',
+        #             '最新价',
+        #             '今日涨跌幅'd'今日主力净流入(净额)','今日主力净流入(净占比)','今日超大单净流入(净额)',
+        #                 '今日超大单净流入(净占比)','今日大单净流入(净额)','今日大单净流入(净占比)',
+        #                 '今日中单净流入(净额)', '今日中单净流入(净占比)','今日小单净流入(净额)','今日小单净流入(净占比)']
+        # table=table[new_cols]
         captial_df = pd.concat([captial_df, table]).drop_duplicates()
 
         print(captial_df.last)
     # captial_df.index = captial_df.index.astype("str")
     # captial_df.index = captial_df['代码'].astype('str')
     # captial_df.reset_index()
-    captial_df.to_csv(csv_file, encoding="utf-8", index="BOARD_CODE")        
+    captial_df.to_csv(csv_file, encoding="utf-8", index="行业代码")        
 
 # def get_north_hy_captial(working_path):
 #     os.chdir(working_path)

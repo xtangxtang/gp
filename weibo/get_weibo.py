@@ -631,13 +631,13 @@ if __name__ == '__main__':
     user_ = args.User
     print(f"scrape {user_}")
 
-    # now = datetime.now()
-    # current_time = now.strftime("%H:%M:%S")
-    # print("Current Time =", current_time)
-    # endtime = datetime.today().strftime('%Y-%m-%d')
-    # endtime = endtime + " 00:00"  
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    endtime = datetime.today().strftime('%Y-%m-%d')
+    endtime = endtime + " 00:00"  
     
-    endtime="2023-01-01 00:00"
+    # endtime="2023-01-01 00:00"
     print(f"endtime: {endtime}") 
 
     if user_ == "wu2198":
