@@ -307,7 +307,7 @@ def get_north_hy_capital(working_path):
     # current_time = now.strftime("%H:%M:%S")
     # print("Current Time =", current_time)
     # date_time = datetime.today().strftime('%Y-%m-%d')
-    date_time = "2023-06-25"
+    date_time = "2023-06-29"
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"

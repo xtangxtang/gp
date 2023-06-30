@@ -509,7 +509,7 @@ class WeiboUserScrapy():
                     wrote_num = self.got_num
 
                 print(f"get page return : {ret}")
-                if (ret == -1):
+                if (ret == -1 or ret == "None"):
                     break               
 
                 # 通过加入随机等待避免被限制。爬虫速度过快容易被系统限制(一段时间后限
@@ -610,7 +610,7 @@ def scrape_tszrsmq():
     tszrsmq_csv = "user/tszrsmq.csv"
     tszrsmq_table = pd.DataFrame(columns=column_names)
     if os.path.exists(tszrsmq_csv):
-        wu2198_table = pd.read_csv(tszrsmq_csv)
+        tszrsmq_table = pd.read_csv(tszrsmq_csv)
     tszrsmq_table.set_index('微博id',inplace=True)
     tszrsmq_table = pd.concat([table, tszrsmq_table]).drop_duplicates()
     print(tszrsmq_table)
@@ -637,7 +637,7 @@ if __name__ == '__main__':
     endtime = datetime.today().strftime('%Y-%m-%d')
     endtime = endtime + " 00:00"  
     
-    # endtime="2023-01-01 00:00"
+    # endtime="2023-03-01 00:00"
     print(f"endtime: {endtime}") 
 
     if user_ == "wu2198":
