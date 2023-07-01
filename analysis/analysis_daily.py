@@ -13,12 +13,12 @@ def convert_scientific_to_chinese(number):
     else:
         return str(int(number / 1e8)) + "亿"
 
-# now = datetime.now()
-# current_time = now.strftime("%H:%M:%S")
-# print("Current Time =", current_time)
-# today = datetime.today().strftime('%Y-%m-%d')
+now = datetime.now()
+current_time = now.strftime("%H:%M:%S")
+print("Current Time =", current_time)
+today = datetime.today().strftime('%Y-%m-%d')
 
-today = "2023-06-30"  
+# today = "2023-06-30"  
 
 ############ 获得每天的大盘涨跌数
 captial_df = pd.DataFrame()
