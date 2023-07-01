@@ -303,11 +303,11 @@ def get_north_hy_capital(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    # now = datetime.now()
-    # current_time = now.strftime("%H:%M:%S")
-    # print("Current Time =", current_time)
-    # date_time = datetime.today().strftime('%Y-%m-%d')
-    date_time = "2023-06-29"
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    date_time = datetime.today().strftime('%Y-%m-%d')
+    # date_time = "2023-06-30"
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"
@@ -570,12 +570,11 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    # get_daily_gg(working_path)
-    # get_daily_bk(working_path)
-    # get_daily_gn(working_path)
-    # get_daily_gg2(working_path)
-    # get_daily_rzrq(working_path)
-    # get_all_captial(working_path)
-    
+    get_daily_gg(working_path)
+    get_daily_bk(working_path)
+    get_daily_gn(working_path)
+    get_daily_gg2(working_path)
+    get_daily_rzrq(working_path)
+    get_all_captial(working_path)    
     get_north_hy_capital(working_path)
 
