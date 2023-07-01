@@ -18,4 +18,13 @@ RUN pip install pyvirtualdisplay
 RUN pip install xvfbwrapper
 RUN pip install cn2an
 RUN pip install chromedriver_autoinstaller
+RUN pip install streamlit python-environ tabulate
 RUN apt-get install -y xvfb
+RUN apt install git
+RUN snap set system proxy.http="http://proxy-us.intel.com:911"
+RUN snap set system proxy.https="http://proxy-us.intel.com:911"
+RUN snap install firefox
+WORKDIR /home/
+RUN git clone https://github.com/Ngonie-x/langchain_csv.git
+WORKDIR /home/langchain_csv
+RUN pip install -r requirements.txt

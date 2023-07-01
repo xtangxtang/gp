@@ -4,7 +4,6 @@ from langchain.chains import RetrievalQA
 from langchain.llms import OpenAI
 import os
 import glob
-from langchain.document_loaders import DirectoryLoader
 
 os.environ["OPENAI_API_KEY"] = "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"
 
@@ -17,11 +16,8 @@ file_paths = glob.glob(os.path.join(directory_path, '*.csv'))
 #     docs = loader.load()
 #     docsearch.add_documents(docs)
 
-loader = DirectoryLoader('./概念主力资金', glob='**/*.csv', loader_cls=CSVLoader)
-# documents = loader.load()
-
 index_creator = VectorstoreIndexCreator()
-# loader = CSVLoader(file_path='./概念主力资金/3D打印.csv')
+loader = CSVLoader(file_path='./概念主力资金/3D打印.csv')
 docsearch = index_creator.from_loaders([loader])
 
 
