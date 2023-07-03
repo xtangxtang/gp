@@ -54,15 +54,41 @@ def analysis_capital(by_date, in_dir, out_dir, omit_str):
             data_dict[name] = data_dict[name].append(row)
         
     # 保存数据到不同文件
+    # for name, data in data_dict.items():
+    #     name = name.replace(f"/", "-")         
+    #     print(f"name: {name}")
+    #     filename = f"{out_dir}/{name}.csv"
+    #     # 规范化文件名        
+    #     data.sort_values(by='日期', ascending=False, inplace=True)
+    #     data.set_index(["日期"], inplace=True)
+    #     data.to_csv(filename)
+    #     print(f"保存 {name} 数据到 {filename}")
+
+
     for name, data in data_dict.items():
-        name = name.replace(f"/", "-")         
+        name = name.replace(f"/", "-") 
         print(f"name: {name}")
         filename = f"{out_dir}/{name}.csv"
-        # 规范化文件名        
-        data.sort_values(by='日期', ascending=False, inplace=True)
-        data.set_index(["日期"], inplace=True)
-        data.to_csv(filename)
-        print(f"保存 {name} 数据到 {filename}")    
+
+        if os.path.exists(filename):
+            # 读取已存在的 CSV 文件数据
+            existing_data = pd.read_csv(filename)
+            existing_data['日期'] = pd.to_datetime(existing_data['日期'])
+
+            # 合并数据并去除重复项
+            merged_data = pd.concat([existing_data, data]).drop_duplicates(subset='日期')
+            merged_data.sort_values(by='日期', ascending=False, inplace=True)
+            merged_data.set_index(["日期"], inplace=True)                   
+
+            # 保存合并后的数据到 CSV 文件
+            merged_data.to_csv(filename)
+            print(f"合并 {name} 数据并保存到 {filename}")
+        else:
+            # 直接保存数据到 CSV 文件
+            data.sort_values(by='日期', ascending=False, inplace=True)
+            data.set_index(["日期"], inplace=True)                  
+            data.to_csv(filename)      
+            print(f"保存 {name} 数据到 {filename}")    
 
 if __name__ == '__main__':
     # now = datetime.now()
