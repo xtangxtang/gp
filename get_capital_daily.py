@@ -297,6 +297,7 @@ def get_all_captial(working_path):
     print(captial_df)
     captial_df.to_csv(csv_file, encoding="utf-8")
     driver.close()
+    display.stop()
 
 def get_north_hy_capital(working_path):
     os.chdir(working_path)
@@ -307,7 +308,7 @@ def get_north_hy_capital(working_path):
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
     date_time = datetime.today().strftime('%Y-%m-%d')
-    # date_time = "2023-06-30"
+    # date_time = "2023-07-05"
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"
@@ -340,7 +341,7 @@ def get_north_hy_capital(working_path):
             html_json = html_json[:index+1]  # 获取 '[' 之后的所有字符
         else:
             html_json = html_json  # 如果字符串中没有 '[' 符号，则结果为原字符串        
-        # print(html_json)    
+
         table = pd.read_json(html_json)
         table = table.drop(columns=['BOARD_INNER_CODE',
                                     'BOARD_TYPE', 
@@ -503,6 +504,7 @@ def get_daily_gg2(working_path):
         captial_df = pd.concat([captial_df,table]).drop_duplicates()      
         print(captial_df.last)
         driver.close()
+        display.stop()
         
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
@@ -561,6 +563,7 @@ def get_daily_rzrq(working_path):
         captial_df = pd.concat([captial_df,table]).drop_duplicates()      
         print(captial_df.last)
         driver.close()
+        display.stop()
         
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
@@ -570,11 +573,18 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily_gg(working_path)
-    get_daily_bk(working_path)
-    get_daily_gn(working_path)
-    get_daily_gg2(working_path)
-    get_daily_rzrq(working_path)
-    get_all_captial(working_path)    
+    # print("===============================>get_daily_gg")
+    # get_daily_gg(working_path)
+    # print("===============================>get_daily_bk")
+    # get_daily_bk(working_path)
+    # print("===============================>get_daily_gn")
+    # get_daily_gn(working_path)
+    # print("===============================>get_daily_gg2")
+    # get_daily_gg2(working_path)
+    # print("===============================>get_daily_rzrq")
+    # get_daily_rzrq(working_path)
+    # print("===============================>get_all_captial")
+    # get_all_captial(working_path)    
+    print("===============================>get_north_hy_capital")
     get_north_hy_capital(working_path)
 

@@ -1,6 +1,9 @@
 import pandas as pd
 import os
 
+def extract_date_prefix(file_name):
+    date_prefix = file_name.split('-')[0]
+    return date_prefix
 
 def read_csv_files(directory):
     all_data = pd.DataFrame()
@@ -10,6 +13,7 @@ def read_csv_files(directory):
         if file.endswith(".csv"):
             # 读取CSV文件
             file_path = os.path.join(directory, file)
+            date_ = extract_date_prefix(file)
             data = pd.read_csv(file_path)
 
             # 合并数据到all_data DataFrame
@@ -33,3 +37,4 @@ if __name__ == '__main__':
     # 选择需要的列
     desired_columns = ['代码', '股票简称', '最新价', '涨跌幅', '换手率', '流入资金(元)', '流出资金(元)', '净额(元)', '成交额(元)', '振幅(%)', '流通股', '流通市值', '市盈率']
     merged_data = merged_data[desired_columns]
+
