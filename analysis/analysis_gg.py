@@ -22,7 +22,7 @@ def read_csv_files(directory):
     return all_data
 
 if __name__ == '__main__':
-    directory1 = "文件目录1的路径"
+    gg2_dir = "../capital/gg/"
     directory2 = "文件目录2的路径"
 
     # 读取文件目录1下的CSV文件
