@@ -570,11 +570,11 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    # get_daily_gg(working_path)
-    # get_daily_bk(working_path)
-    # get_daily_gn(working_path)
-    # get_daily_gg2(working_path)
-    # get_daily_rzrq(working_path)
-    # get_all_captial(working_path)    
+    get_daily_gg(working_path)
+    get_daily_bk(working_path)
+    get_daily_gn(working_path)
+    get_daily_gg2(working_path)
+    get_daily_rzrq(working_path)
+    get_all_captial(working_path)    
     get_north_hy_capital(working_path)
 

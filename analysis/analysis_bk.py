@@ -94,10 +94,14 @@ def analysis_capital(by_date, in_dir, out_dir, omit_str):
         if os.path.exists(filename):
             # 读取已存在的 CSV 文件数据
             existing_data = pd.read_csv(filename)
-            existing_data['日期'] = pd.to_datetime(existing_data['日期'])
+            # existing_data['日期'] = pd.to_datetime(existing_data['日期'])
+            # print("existing_data")
+            # print(existing_data)
 
             # 合并数据并去除重复项
-            merged_data = pd.concat([existing_data, data]).drop_duplicates(subset='日期')
+            merged_data = pd.concat([existing_data, data]).drop_duplicates()
+            # print("merged_data")
+            # print(merged_data)
             merged_data.sort_values(by='日期', ascending=False, inplace=True)
             merged_data.set_index(["日期"], inplace=True)                   
 
@@ -168,23 +172,18 @@ def analysis_continue(dir, out_dir, continue_day):
     print(all_data)
     all_data.to_csv(f"{out_dir}/{date_time}-{continue_day}日-主力净流入.csv")
 
-
-
-
-    
-
 if __name__ == '__main__':
-    # now = datetime.now()
-    # current_time = now.strftime("%H:%M:%S")
-    # print("Current Time =", current_time)
-    # date_time = datetime.today().strftime('%Y-%m-%d')    
-    date_time=""
-    # # 指定目录路径
-    # directory = f"../capital/bk"  # 替换为你实际的目录路径    
-    # analysis_capital(date_time, directory, "板块主力资金", "-bk")
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    date_time = datetime.today().strftime('%Y-%m-%d')    
+    # date_time=""
+    # 指定目录路径
+    directory = f"../capital/bk"  # 替换为你实际的目录路径    
+    analysis_capital(date_time, directory, "板块主力资金", "-bk")
 
-    # directory = f"../capital/gn"  # 替换为你实际的目录路径 
-    # analysis_capital(date_time, directory, "概念主力资金", "-gn")
+    directory = f"../capital/gn"  # 替换为你实际的目录路径 
+    analysis_capital(date_time, directory, "概念主力资金", "-gn")
 
     directory = f"./概念主力资金/"  # 替换为你实际的目录路径 
     out_dir= f"./概念主力资金分析/"
