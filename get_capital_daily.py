@@ -305,11 +305,14 @@ def get_north_hy_capital(working_path):
     os.chdir(working_path + "/capital")
 
     now = datetime.now()
-    yesterday = now - timedelta(days=1)
-    current_time = yesterday.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    date_time = datetime.today().strftime('%Y-%m-%d')
+    
+    # current_time = yesterday.strftime("%H:%M:%S")
+    
+    date_time = datetime.today()
+    date_time = date_time - timedelta(days=1)
+    date_time = date_time.strftime('%Y-%m-%d')
     # date_time = "2023-07-05"
+    print("Current Time =", date_time)
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"
@@ -574,18 +577,18 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    print("===============================>get_daily_gg")
-    get_daily_gg(working_path)
-    print("===============================>get_daily_bk")
-    get_daily_bk(working_path)
-    print("===============================>get_daily_gn")
-    get_daily_gn(working_path)
-    print("===============================>get_daily_gg2")
-    get_daily_gg2(working_path)
-    print("===============================>get_daily_rzrq")
-    get_daily_rzrq(working_path)
-    print("===============================>get_all_captial")
-    get_all_captial(working_path)    
-    print("===============================>get_north_hy_capital")
+    # print("===============================>get_daily_gg")
+    # get_daily_gg(working_path)
+    # print("===============================>get_daily_bk")
+    # get_daily_bk(working_path)
+    # print("===============================>get_daily_gn")
+    # get_daily_gn(working_path)
+    # print("===============================>get_daily_gg2")
+    # get_daily_gg2(working_path)
+    # print("===============================>get_daily_rzrq")
+    # get_daily_rzrq(working_path)
+    # print("===============================>get_all_captial")
+    # get_all_captial(working_path)    
+    # print("===============================>get_north_hy_capital")
     get_north_hy_capital(working_path)
 

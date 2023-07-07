@@ -13,6 +13,7 @@ cd ../
 cd analysis
 python3 analysis_daily.py
 python3 analysis_bk.py
+python3 analysis_gg.py
 cd ../
 
 
