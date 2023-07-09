@@ -1,39 +1,76 @@
-from langchain.document_loaders import CSVLoader
-from langchain.indexes import VectorstoreIndexCreator
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
 import os
 import glob
-from langchain.document_loaders import DirectoryLoader
+from datetime import datetime
+import pandas as pd
 
-os.environ["OPENAI_API_KEY"] = "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"
+def get_days_gg_capital(date, by_date):
+    directory = "个股资金分析/all/"
 
-directory_path = './概念主力资金/'
-# 获取目录中的所有CSV文件路径
-file_paths = glob.glob(os.path.join(directory_path, '*.csv'))
-# 加载多个CSV文件
-# for file_path in file_paths:
-#     loader = CSVLoader(file_path=file_path)
-#     docs = loader.load()
-#     docsearch.add_documents(docs)
+    # 创建一个空的 DataFrame 用于保存结果
+    result_df = pd.DataFrame()
 
-loader = DirectoryLoader('./概念主力资金', glob='**/*.csv', loader_cls=CSVLoader)
-# documents = loader.load()
+    # 遍历目录中的 CSV 文件
+    for file_name in os.listdir(directory):
+        if file_name.endswith(".csv"):
+            file_path = os.path.join(directory, file_name)
+            
+            # 读取 CSV 文件
+            df = pd.read_csv(file_path)
+            
+            df['日期'] = pd.to_datetime(df['日期'])
+            # 按照日期降序排序
+            df = df.sort_values('日期', ascending=False)
+            
+            # 找出指定日期之前的最近10行数据
+            specified_date = pd.to_datetime(date) 
+            recent_10_days = df[df['日期'] <= specified_date].head(by_date)
+            
+            # 计算净买入率的总和
+            recent_10_days['净买入率'] = recent_10_days['净买入率'].str.rstrip('%').astype(float) / 100        
+            net_buy_sum = recent_10_days['净买入率'].sum()
+            # print(net_buy_sum)
+            
+            # 如果净买入率总和大于0，则添加股票简称到结果 DataFrame
+            if net_buy_sum > 0.01:
+                stock_names = recent_10_days['股票简称'].unique()
+                latest_price = recent_10_days.iloc[0]['最新价']
+                prev_close = recent_10_days.iloc[-1]['最新价']
+                
+                price_change = (latest_price - prev_close) / prev_close
+                
+                net_buy_ratio = net_buy_sum / price_change
+                
+                data = pd.DataFrame({
+                    '股票简称': stock_names,
+                    f'{by_date}日净买入率总和': net_buy_sum,
+                    f'{by_date}日最新价涨跌幅': price_change,                    
+                    f'{by_date}日净买入率/涨跌幅': net_buy_ratio
+                })
+                result_df = pd.concat([result_df, data], ignore_index=True)
 
-index_creator = VectorstoreIndexCreator()
-# loader = CSVLoader(file_path='./概念主力资金/3D打印.csv')
-docsearch = index_creator.from_loaders([loader])
+    # 去除重复的股票简称
+    result_df = result_df.drop_duplicates()
+
+    # 按照净买入率总和从高到低排序
+    # result_df = result_df.sort_values('净买入率总和', ascending=False)
+
+    result_df = result_df.sort_values(f'{by_date}日净买入率/涨跌幅', ascending=False)
+
+    # 将净买入率总和转换回百分比格式
+    result_df[f'{by_date}日净买入率总和'] = (result_df[f'{by_date}日净买入率总和'] * 100).round(2).astype(str) + '%'    
+
+    result_df[f'{by_date}日最新价涨跌幅'] = (result_df[f'{by_date}日最新价涨跌幅'] * 100).round(2).astype(str) + '%' 
+
+    # 打印结果
+    print(result_df)
 
 
+if __name__ == '__main__':
+    gnzl_dir = "个股资金分析/all"
 
-chain = RetrievalQA.from_chain_type(llm=OpenAI(), chain_type="stuff", 
-                                    retriever=docsearch.vectorstore.as_retriever(), 
-                                    input_key="question")
-# query = "最近10日\"今日主力净流入(净额)\"这一列大于0的次数有多少？如果大于0，请把对应的\"日期\"和\"名称\"告诉我"
-# response = chain({"question": query})
-# print(response['result'])
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today_time = datetime.today().strftime('%Y-%m-%d')  
 
-query = "对这个文档最近10个交易日你有什么分析结果？"
-response = chain({"question": query})
-print(response['result'])
-     
+    get_days_gg_capital("2023-07-07", 10)

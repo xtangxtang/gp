@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+from datetime import datetime
 
 def conver_ltsz():
     directory = "./个股资金分析/all/"
@@ -139,7 +140,12 @@ if __name__ == '__main__':
     gg2_dir = "../capital/gg2/"
     gg_alldaily_dir = "../gp_daily/all/"
 
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today_time = datetime.today().strftime('%Y-%m-%d')  
+
     # 读取文件目录1下的CSV文件
-    # data1 = read_csv_files(gg2_dir, gg_alldaily_dir, "2023-06-26")
-    conver_ltsz()
+    data1 = read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
+    # conver_ltsz()
 

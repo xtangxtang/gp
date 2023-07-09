@@ -3,17 +3,17 @@ if [[ $(date +%u) -gt 5 ]]; then
     exit
 fi
 
-./run_get_capital.sh
-./run_get_trade_daily.sh
-
-cd weibo
-./get_weibo.sh
-cd ../
+# ./run_get_capital.sh
+# ./run_get_trade_daily.sh
 
 cd analysis
 python3 analysis_daily.py
 python3 analysis_bk.py
 python3 analysis_gg.py
+cd ../
+
+cd weibo
+./get_weibo.sh
 cd ../
 
 
