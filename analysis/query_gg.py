@@ -2,6 +2,7 @@ import os
 import glob
 from datetime import datetime
 import pandas as pd
+import pysnowball as ball
 
 def get_days_gg_capital(date, by_date):
     directory = "个股资金分析/all/"
@@ -38,7 +39,7 @@ def get_days_gg_capital(date, by_date):
                 
                 price_change = (latest_price - prev_close) / prev_close
                 
-                net_buy_ratio = net_buy_sum / price_change
+                net_buy_ratio = abs(net_buy_sum / price_change)
                 
                 data = pd.DataFrame({
                     '股票简称': stock_names,
@@ -62,7 +63,7 @@ def get_days_gg_capital(date, by_date):
     result_df[f'{by_date}日最新价涨跌幅'] = (result_df[f'{by_date}日最新价涨跌幅'] * 100).round(2).astype(str) + '%' 
 
     # 打印结果
-    print(result_df)
+    print(result_df.head(50))
 
 
 if __name__ == '__main__':
@@ -73,4 +74,5 @@ if __name__ == '__main__':
     print("Current Time =", current_time)
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
-    get_days_gg_capital("2023-07-07", 10)
+    ball.set_token('xq_a_token=059ca42bb432441cdb7c65fcd755ac80e61f4e36;')
+    print(ball.cash_flow('SH600000'))

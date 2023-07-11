@@ -3,8 +3,8 @@ if [[ $(date +%u) -gt 5 ]]; then
     exit
 fi
 
-# ./run_get_capital.sh
-# ./run_get_trade_daily.sh
+./run_get_capital.sh
+./run_get_trade_daily.sh
 
 cd analysis
 python3 analysis_daily.py

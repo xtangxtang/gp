@@ -19,6 +19,7 @@ RUN pip install xvfbwrapper
 RUN pip install cn2an
 RUN pip install chromedriver_autoinstaller
 RUN pip install streamlit python-environ tabulate
+RUN pip install pysnowball
 RUN apt-get install -y xvfb
 RUN apt install git
 RUN snap set system proxy.http="http://proxy-us.intel.com:911"
