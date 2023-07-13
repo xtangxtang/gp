@@ -305,19 +305,38 @@ def get_north_hy_capital(working_path):
     os.chdir(working_path + "/capital")
 
     now = datetime.now()
+
+    # 中秋节、国庆节：9月29日（星期五）至10月6日（星期五）休市，10月9日（星期一）起照常开市。另外，10月7日（星期六）、10月8日（星期日）为周末休市。
+    close_date = ["2023-09-29", "2023-09-30", "2023-10-01", "2023-10-02", "2023-10-03", "2023-10-04", "2023-10-05", "2023-10-06"]
     
     # current_time = yesterday.strftime("%H:%M:%S")
-    
     date_time = datetime.today()
-    date_time = date_time - timedelta(days=1)
+    # date_time = "2023-07-11"
+    date_time = datetime.strptime(date_time, "%Y-%m-%d")
+    while(True):        
+        date_time = date_time - timedelta(days=1)
+        date_time_str = date_time.strftime('%Y-%m-%d')
+        # 判断今天是否是周六或周日
+        if date_time.weekday() == 5:  # 5 表示星期六
+            print(f"{date_time_str}是周六")
+            continue
+        elif date_time.weekday() == 6:  # 6 表示星期日
+            print(f"{date_time_str}是周日")
+            continue
+        elif date_time_str in close_date:
+            print(f"{date_time_str}是休市")
+            continue
+        else:
+            break        
+    
     date_time = date_time.strftime('%Y-%m-%d')
-    # date_time = "2023-07-05"
     print("Current Time =", date_time)
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/north/{date_time}-north-hy.csv"
     if os.path.exists(csv_file):
-        os.remove(csv_file)
+        print(f"{working_path}/capital/north/{date_time}-north-hy.csv 存在")
+        return
 
     page_range = range(1, 3)
     for pagenum in page_range:

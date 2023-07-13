@@ -3,76 +3,54 @@ import glob
 from datetime import datetime
 import pandas as pd
 import pysnowball as ball
+import argparse
+import pandas as pd
 
-def get_days_gg_capital(date, by_date):
-    directory = "个股资金分析/all/"
+def calculate_sum(file_name, date_str, delta_time, path='.'):
+    # 读取 CSV 文件
+    df = pd.read_csv(f'{path}/{file_name}')
+    
+    # 将日期列转换为 datetime 类型
+    df['日期'] = pd.to_datetime(df['日期'])
+    
+    # 筛选出给定日期前 10 行的数据
+    mask = df['日期'] <= date_str
+    data = df.loc[mask].head(delta_time)
+    print(data)
+    
+    # 计算净额(亿元)和净买入率总和
+    net_amount_sum = round(data['净额(亿元)'].sum(), 2)
+    net_buy_rate_sum = round(data['净买入率'].str.rstrip('%').astype('float').sum(), 2)
+    
+    net_buy_rate_sum = f'{net_buy_rate_sum}%'
+    
+    print(f'{delta_time}日净额(亿元)总和: {net_amount_sum}')
+    print(f'{delta_time}日净买入率总和: {net_buy_rate_sum}')
 
-    # 创建一个空的 DataFrame 用于保存结果
-    result_df = pd.DataFrame()
-
-    # 遍历目录中的 CSV 文件
-    for file_name in os.listdir(directory):
-        if file_name.endswith(".csv"):
-            file_path = os.path.join(directory, file_name)
-            
-            # 读取 CSV 文件
-            df = pd.read_csv(file_path)
-            
-            df['日期'] = pd.to_datetime(df['日期'])
-            # 按照日期降序排序
-            df = df.sort_values('日期', ascending=False)
-            
-            # 找出指定日期之前的最近10行数据
-            specified_date = pd.to_datetime(date) 
-            recent_10_days = df[df['日期'] <= specified_date].head(by_date)
-            
-            # 计算净买入率的总和
-            recent_10_days['净买入率'] = recent_10_days['净买入率'].str.rstrip('%').astype(float) / 100        
-            net_buy_sum = recent_10_days['净买入率'].sum()
-            # print(net_buy_sum)
-            
-            # 如果净买入率总和大于0，则添加股票简称到结果 DataFrame
-            if net_buy_sum > 0.01:
-                stock_names = recent_10_days['股票简称'].unique()
-                latest_price = recent_10_days.iloc[0]['最新价']
-                prev_close = recent_10_days.iloc[-1]['最新价']
-                
-                price_change = (latest_price - prev_close) / prev_close
-                
-                net_buy_ratio = abs(net_buy_sum / price_change)
-                
-                data = pd.DataFrame({
-                    '股票简称': stock_names,
-                    f'{by_date}日净买入率总和': net_buy_sum,
-                    f'{by_date}日最新价涨跌幅': price_change,                    
-                    f'{by_date}日净买入率/涨跌幅': net_buy_ratio
-                })
-                result_df = pd.concat([result_df, data], ignore_index=True)
-
-    # 去除重复的股票简称
-    result_df = result_df.drop_duplicates()
-
-    # 按照净买入率总和从高到低排序
-    # result_df = result_df.sort_values('净买入率总和', ascending=False)
-
-    result_df = result_df.sort_values(f'{by_date}日净买入率/涨跌幅', ascending=False)
-
-    # 将净买入率总和转换回百分比格式
-    result_df[f'{by_date}日净买入率总和'] = (result_df[f'{by_date}日净买入率总和'] * 100).round(2).astype(str) + '%'    
-
-    result_df[f'{by_date}日最新价涨跌幅'] = (result_df[f'{by_date}日最新价涨跌幅'] * 100).round(2).astype(str) + '%' 
-
-    # 打印结果
-    print(result_df.head(50))
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--Symbol", help="股票代码")
+    parser.add_argument("-d", "--Bydate", help="日期")
+    parser.add_argument("-p", "--Period", help="天数")
+
+    args = parser.parse_args()
+    symbol = args.Symbol
+    bydate = args.Bydate
+    period = args.Period
+
     gnzl_dir = "个股资金分析/all"
 
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    today_time = datetime.today().strftime('%Y-%m-%d')
 
-    ball.set_token('xq_a_token=059ca42bb432441cdb7c65fcd755ac80e61f4e36;')
-    print(ball.cash_flow('SH600000'))
+    symbol = symbol + ".csv"
+    period = int(period)  
+
+    calculate_sum(symbol, bydate, period, gnzl_dir)
+
+    # ball.set_token('xq_a_token=059ca42bb432441cdb7c65fcd755ac80e61f4e36;')
+    # print(ball.cash_flow('SH600000'))

@@ -145,6 +145,8 @@ if __name__ == '__main__':
     print("Current Time =", current_time)
     today_time = datetime.today().strftime('%Y-%m-%d')  
 
+    # today_time = "2023-07-12"
+
     # 读取文件目录1下的CSV文件
     data1 = read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
     # conver_ltsz()

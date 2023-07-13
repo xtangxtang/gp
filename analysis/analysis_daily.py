@@ -18,7 +18,7 @@ current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 today = datetime.today().strftime('%Y-%m-%d')
 
-today = "2023-07-10"  
+# today = "2023-07-10"  
 
 ############ 获得每天的大盘涨跌数
 captial_df = pd.DataFrame()

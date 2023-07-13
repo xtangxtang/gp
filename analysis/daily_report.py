@@ -63,6 +63,7 @@ def get_days_gg_capital(date, by_date):
 
     # 打印结果
     print(result_df.head(50))
+    result_df.to_csv(f"个股资金每日报告/{date}_gg_capital.csv", index=False)
 
 
 if __name__ == '__main__':
