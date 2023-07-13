@@ -135,6 +135,73 @@ def read_csv_files(gg2_dir1, all_daily_dir2, date):
             row_data = pd.DataFrame(row).T  # 将当前行数据转换为 DataFrame
             row_data.to_csv(filename, index=False)  # 将数据保存到文件
 
+def generate_days_gg_capital_report(date, by_date):
+    directory = "个股资金分析/all/"
+
+    # 创建一个空的 DataFrame 用于保存结果
+    result_df = pd.DataFrame()
+
+    # 遍历目录中的 CSV 文件
+    for file_name in os.listdir(directory):
+        if file_name.endswith(".csv"):
+            file_path = os.path.join(directory, file_name)
+            
+            # 读取 CSV 文件
+            df = pd.read_csv(file_path)
+            
+            df['日期'] = pd.to_datetime(df['日期'])
+            # 按照日期降序排序
+            df = df.sort_values('日期', ascending=False)
+            
+            # 找出指定日期之前的最近10行数据
+            specified_date = pd.to_datetime(date) 
+            recent_10_days = df[df['日期'] <= specified_date].head(by_date)
+            
+            # 计算净买入率的总和
+            recent_10_days['净买入率'] = recent_10_days['净买入率'].str.rstrip('%').astype(float) / 100        
+            net_buy_sum = recent_10_days['净买入率'].sum()
+            # print(net_buy_sum)
+            
+            # 如果净买入率总和大于0，则添加股票简称到结果 DataFrame
+            if net_buy_sum > 0.01:
+                stock_names = recent_10_days['股票简称'].unique()
+                latest_price = recent_10_days.iloc[0]['最新价']
+                prev_close = recent_10_days.iloc[-1]['最新价']
+                
+                price_change = (latest_price - prev_close) / prev_close
+                
+                net_buy_ratio = abs(net_buy_sum / price_change)
+                
+                data = pd.DataFrame({
+                    '股票简称': stock_names,
+                    f'{by_date}日净买入率总和': net_buy_sum,
+                    f'{by_date}日最新价涨跌幅': price_change,                    
+                    f'{by_date}日净买入率/涨跌幅': net_buy_ratio
+                })
+                result_df = pd.concat([result_df, data], ignore_index=True)
+
+    # 去除重复的股票简称
+    result_df = result_df.drop_duplicates()
+
+    # 按照净买入率/涨跌幅总和从高到低排序
+    result_df1 = result_df.sort_values(f'{by_date}日净买入率/涨跌幅', ascending=False)
+    # 按照净买入率总和从高到低排序
+    result_df2 = result_df.sort_values(f'{by_date}日净买入率总和', ascending=False)
+
+    # 将净买入率总和转换回百分比格式
+    result_df1[f'{by_date}日净买入率总和'] = (result_df1[f'{by_date}日净买入率总和'] * 100).round(2).astype(str) + '%'    
+    result_df1[f'{by_date}日最新价涨跌幅'] = (result_df1[f'{by_date}日最新价涨跌幅'] * 100).round(2).astype(str) + '%' 
+    # 打印结果
+    print(result_df1.head(50))
+    result_df1.to_csv(f"个股资金每日报告/{date}/{by_date}日净买入率涨跌幅.csv", index=False)
+
+    # 将净买入率总和转换回百分比格式
+    result_df2[f'{by_date}日净买入率总和'] = (result_df2[f'{by_date}日净买入率总和'] * 100).round(2).astype(str) + '%'    
+    result_df2[f'{by_date}日最新价涨跌幅'] = (result_df2[f'{by_date}日最新价涨跌幅'] * 100).round(2).astype(str) + '%' 
+    # 打印结果
+    print(result_df2.head(50))
+    result_df2.to_csv(f"个股资金每日报告/{date}/{by_date}日净买入率.csv", index=False)    
+    
 
 if __name__ == '__main__':
     gg2_dir = "../capital/gg2/"
@@ -148,6 +215,20 @@ if __name__ == '__main__':
     # today_time = "2023-07-12"
 
     # 读取文件目录1下的CSV文件
-    data1 = read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
+    # read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
     # conver_ltsz()
+
+    gnzl_dir = "个股资金分析/all"
+
+    directory = f"个股资金每日报告/{today_time}"
+
+    # 检查目录是否存在
+    if not os.path.exists(directory):
+        # 创建目录
+        os.makedirs(directory)
+        
+    generate_days_gg_capital_report(today_time, 30)
+    generate_days_gg_capital_report(today_time, 10)
+    generate_days_gg_capital_report(today_time, 5)
+    generate_days_gg_capital_report(today_time, 1)
 

@@ -124,7 +124,7 @@ except FileNotFoundError:
     merged_df = result_df   
 
 print(merged_df)
-merged_df.to_csv('daily_all_report.csv')
+merged_df.to_csv('大盘每日报告/daily_all_report.csv')
 
 
 
