@@ -215,7 +215,7 @@ if __name__ == '__main__':
     # today_time = "2023-07-12"
 
     # 读取文件目录1下的CSV文件
-    # read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
+    read_csv_files(gg2_dir, gg_alldaily_dir, today_time)
     # conver_ltsz()
 
     gnzl_dir = "个股资金分析/all"
