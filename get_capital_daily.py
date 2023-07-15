@@ -312,7 +312,7 @@ def get_north_hy_capital(working_path):
     # current_time = yesterday.strftime("%H:%M:%S")
     date_time = datetime.today()
     # date_time = "2023-07-11"
-    date_time = datetime.strptime(date_time, "%Y-%m-%d")
+    # date_time = datetime.strptime(date_time, "%Y-%m-%d")
     while(True):        
         date_time = date_time - timedelta(days=1)
         date_time_str = date_time.strftime('%Y-%m-%d')

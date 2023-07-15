@@ -18,7 +18,7 @@ current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
 today = datetime.today().strftime('%Y-%m-%d')
 
-# today = "2023-07-10"  
+# today = "2023-06-26"  
 
 ############ 获得每天的大盘涨跌数
 captial_df = pd.DataFrame()
@@ -118,11 +118,13 @@ result_df = pd.DataFrame(data)
 result_df.set_index("日期",inplace=True)
 
 try:
-    old_df = pd.read_csv('daily_all_report.csv', index_col="日期")
+    old_df = pd.read_csv('大盘每日报告/daily_all_report.csv', index_col="日期")
     merged_df = pd.concat([result_df, old_df]).drop_duplicates()
 except FileNotFoundError:
     merged_df = result_df   
 
+# existing_data.sort_values(by='日期', ascending=False, inplace=True)
+merged_df.sort_values(by='日期', ascending=False, inplace=True)
 print(merged_df)
 merged_df.to_csv('大盘每日报告/daily_all_report.csv')
 
