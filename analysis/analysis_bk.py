@@ -166,11 +166,12 @@ def analysis_continue(dir, out_dir, continue_day):
             tmpdf = pd.DataFrame({'日期': date_time, '概念名称': positive_data['名称'][0], '净流入': positive_data['今日主力净流入(净额)'].sum()}, index=[0])
             tmpdf.set_index(['日期'], inplace=True)
             all_data = all_data.append(tmpdf)
-    
-    all_data.sort_values(by='净流入', ascending=False, inplace=True)
-    all_data['净流入'] = all_data['净流入'].apply(convert_scientific_to_chinese)
-    print(all_data)
-    all_data.to_csv(f"{out_dir}/{date_time}-{continue_day}日-主力净流入.csv")
+
+    if len(all_data) > 0:
+        all_data.sort_values(by='净流入', ascending=False, inplace=True)
+        all_data['净流入'] = all_data['净流入'].apply(convert_scientific_to_chinese)
+        print(all_data)
+        all_data.to_csv(f"{out_dir}/{date_time}-{continue_day}日-主力净流入.csv")
 
 if __name__ == '__main__':
     now = datetime.now()

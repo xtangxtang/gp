@@ -58,10 +58,15 @@ def get_daily(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/gp_daily")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/gp_daily/all/{today_time}-alldaily.csv"

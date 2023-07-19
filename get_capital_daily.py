@@ -57,10 +57,15 @@ def get_daily_gg(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/gg/{today_time}-gg.csv"
@@ -127,10 +132,15 @@ def get_daily_bk(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/bk/{today_time}-bk.csv"
@@ -192,10 +202,15 @@ def get_daily_gn(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/gn/{today_time}-gn.csv"
@@ -309,10 +324,17 @@ def get_north_hy_capital(working_path):
     # 中秋节、国庆节：9月29日（星期五）至10月6日（星期五）休市，10月9日（星期一）起照常开市。另外，10月7日（星期六）、10月8日（星期日）为周末休市。
     close_date = ["2023-09-29", "2023-09-30", "2023-10-01", "2023-10-02", "2023-10-03", "2023-10-04", "2023-10-05", "2023-10-06"]
     
-    # current_time = yesterday.strftime("%H:%M:%S")
-    date_time = datetime.today()
+    if 'TODAY' in os.environ:
+        date_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {date_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        date_time = datetime.today().strftime('%Y-%m-%d')  
     # date_time = "2023-07-11"
-    # date_time = datetime.strptime(date_time, "%Y-%m-%d")
+    date_time = datetime.strptime(date_time, "%Y-%m-%d")
     while(True):        
         date_time = date_time - timedelta(days=1)
         date_time_str = date_time.strftime('%Y-%m-%d')
@@ -538,10 +560,15 @@ def get_daily_rzrq(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/rzrq/{today_time}-rzrq.csv"

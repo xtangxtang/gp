@@ -12,5 +12,6 @@ pip install mechanize
 pip install pyvirtualdisplay
 pip install xvfbwrapper
 pip install cn2an
+pip install matplotlib reportlab
 apt-get install -y xvfb
 
