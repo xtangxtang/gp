@@ -35,6 +35,8 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--Bydate", help="日期")
     parser.add_argument("-p", "--Period", help="天数")
 
+    #python3 query_gg.py -s sh688508 -d 2023-07-19 -p 5
+
     args = parser.parse_args()
     symbol = args.Symbol
     bydate = args.Bydate

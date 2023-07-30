@@ -501,10 +501,15 @@ def get_daily_gg2(working_path):
     print("working_path " + working_path)
     os.chdir(working_path + "/capital")
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     captial_df = pd.DataFrame()
     csv_file = f"{working_path}/capital/gg2/{today_time}-gg2.csv"
@@ -618,23 +623,80 @@ def get_daily_rzrq(working_path):
     captial_df.to_csv(csv_file, encoding="utf-8")    
     print(captial_df)
 
+## 获得行业资金流入和流出
+def get_daily_hy(working_path):
+    os.chdir(working_path)
+    print("working_path " + working_path)
+    os.chdir(working_path + "/capital")
+
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
+    
+
+    captial_df = pd.DataFrame()
+    csv_file = f"{working_path}/capital/同花顺行业/{today_time}-hy.csv"
+    if os.path.exists(csv_file):
+        os.remove(csv_file)
+    
+    page_range = range(1, 3)
+    for pagenum in page_range:
+        url = f"http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/page/{pagenum}/ajax/1/free/1/"
+        from pyvirtualdisplay import Display
+        from pyvirtualdisplay.xephyr import XephyrDisplay 
+        display = Display(visible=0, size=(1920, 1080)) 
+        # display = XephyrDisplay() 
+        display.start()
+        ua = UserAgent()
+        userAgent = ua.chrome
+        chrome_options = Options()
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option('useAutomationExtension', False)
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument(f'user-agent={userAgent}')
+        driver = webdriver.Chrome ('/usr/bin/chromedriver',options = chrome_options)
+        driver.get(url)         
+
+        html = driver.page_source
+        time.sleep(2)
+        table = pd.read_html(html)[0]  
+        table = table.drop(columns=['序号'])
+
+        captial_df = pd.concat([captial_df,table]).drop_duplicates()      
+        print(captial_df.last)
+        driver.close()
+        display.stop()
+        
+    captial_df.to_csv(csv_file, encoding="utf-8")    
+    print(captial_df)
+
 if __name__ == "__main__":
 
     chunks_num =5
     working_path = os.getcwd()
 
-    print("===============================>get_daily_gg")
-    get_daily_gg(working_path)
-    print("===============================>get_daily_bk")
-    get_daily_bk(working_path)
-    print("===============================>get_daily_gn")
-    get_daily_gn(working_path)
-    print("===============================>get_daily_gg2")
-    get_daily_gg2(working_path)
-    print("===============================>get_daily_rzrq")
-    get_daily_rzrq(working_path)
-    print("===============================>get_all_captial")
-    get_all_captial(working_path)    
-    print("===============================>get_north_hy_capital")
-    get_north_hy_capital(working_path)
+    # print("===============================>get_daily_gg")
+    # get_daily_gg(working_path)
+    # print("===============================>get_daily_bk")
+    # get_daily_bk(working_path)
+    # print("===============================>get_daily_gn")
+    # get_daily_gn(working_path)
+    # print("===============================>get_daily_gg2")
+    # get_daily_gg2(working_path)
+    # print("===============================>get_daily_rzrq")
+    # get_daily_rzrq(working_path)
+    # print("===============================>get_all_captial")
+    # get_all_captial(working_path)    
+    # print("===============================>get_north_hy_capital")
+    # get_north_hy_capital(working_path)
+    print("===============================>get_daily_hy 同花顺行业")
+    get_daily_hy(working_path)
+
 
