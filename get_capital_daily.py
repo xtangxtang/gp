@@ -682,21 +682,86 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    # print("===============================>get_daily_gg")
-    # get_daily_gg(working_path)
-    # print("===============================>get_daily_bk")
-    # get_daily_bk(working_path)
-    # print("===============================>get_daily_gn")
-    # get_daily_gn(working_path)
-    # print("===============================>get_daily_gg2")
-    # get_daily_gg2(working_path)
-    # print("===============================>get_daily_rzrq")
-    # get_daily_rzrq(working_path)
-    # print("===============================>get_all_captial")
-    # get_all_captial(working_path)    
-    # print("===============================>get_north_hy_capital")
-    # get_north_hy_capital(working_path)
-    print("===============================>get_daily_hy 同花顺行业")
-    get_daily_hy(working_path)
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_gg")
+            get_daily_gg(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_bk")
+            get_daily_bk(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_gn")
+            get_daily_gn(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_gg2")
+            get_daily_gg2(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_rzrq")
+            get_daily_rzrq(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_all_captial")
+            get_all_captial(working_path) 
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_north_hy_capital")
+            get_north_hy_capital(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    retry= 0
+    while(retry != 5):
+        try:
+            print("===============================>get_daily_hy 同花顺行业")
+            get_daily_hy(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break 
+
+
 
 

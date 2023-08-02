@@ -14,16 +14,16 @@ def convert_scientific_to_chinese(number):
         return str(int(number / 1e8)) + "亿"
 
 if 'TODAY' in os.environ:
-    today_time = os.environ['TODAY']
+    today = os.environ['TODAY']
     print(f"TODAY 环境变量的值为: {today_time}")
 else:
     print("TODAY 环境变量不存在")    
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    today = datetime.today().strftime('%Y-%m-%d')  
 
-today = "2023-07-28"  
+# today = "2023-07-28"  
 
 captial_df = pd.DataFrame()
 csv_file = f"../capital/同花顺行业/{today}-hy.csv"
