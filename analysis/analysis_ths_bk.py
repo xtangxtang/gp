@@ -15,7 +15,7 @@ def convert_scientific_to_chinese(number):
 
 if 'TODAY' in os.environ:
     today = os.environ['TODAY']
-    print(f"TODAY 环境变量的值为: {today_time}")
+    print(f"TODAY 环境变量的值为: {today}")
 else:
     print("TODAY 环境变量不存在")    
     now = datetime.now()

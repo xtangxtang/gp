@@ -120,7 +120,17 @@ if __name__ == "__main__":
     chunks_num =5
     working_path = os.getcwd()
 
-    get_daily(working_path)
+    retry= 0
+    while(retry != 20):
+        try:
+            print("===============================>get_daily")
+            get_daily(working_path)
+        except Exception:
+            time.sleep(1)
+            retry = retry + 1
+        break
+
+    
 
     
 

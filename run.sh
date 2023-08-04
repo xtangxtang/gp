@@ -18,9 +18,9 @@ python3 analysis_ths_bk.py
 python3 daily_report.py
 cd ../
 
-cd weibo
-./get_weibo.sh
-cd ../
+# cd weibo
+# ./get_weibo.sh
+# cd ../
 
 
 # ./run_self_list.sh
