@@ -121,7 +121,7 @@ if __name__ == "__main__":
     working_path = os.getcwd()
 
     retry= 0
-    while(retry != 20):
+    while(1):
         try:
             print("===============================>get_daily")
             get_daily(working_path)
