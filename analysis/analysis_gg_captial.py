@@ -207,10 +207,15 @@ if __name__ == '__main__':
     gg2_dir = "../capital/gg2/"
     gg_alldaily_dir = "../gp_daily/all/"
 
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')    
 
     # today_time = "2023-07-12"
 

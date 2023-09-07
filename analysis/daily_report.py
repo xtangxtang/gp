@@ -119,10 +119,15 @@ def generate_gg_captial_report(day, period):
 
 if __name__ == '__main__':
     
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    today_time = datetime.today().strftime('%Y-%m-%d')  
+    if 'TODAY' in os.environ:
+        today_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {today_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        today_time = datetime.today().strftime('%Y-%m-%d')  
 
     generate_gg_captial_report(today_time, "1")
     generate_gg_captial_report(today_time, "5")

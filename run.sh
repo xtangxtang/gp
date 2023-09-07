@@ -5,7 +5,7 @@ if [[ $(date +%u) -gt 5 ]]; then
     exit
 fi
 
-# export TODAY="2023-07-28"
+# export TODAY="2023-08-24"
 
 ./run_get_capital.sh
 ./run_get_trade_daily.sh

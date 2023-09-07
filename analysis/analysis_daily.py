@@ -16,7 +16,17 @@ def convert_scientific_to_chinese(number):
 now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 print("Current Time =", current_time)
-today = datetime.today().strftime('%Y-%m-%d')
+today_time = datetime.today().strftime('%Y-%m-%d')
+
+if 'TODAY' in os.environ:
+    today = os.environ['TODAY']
+    print(f"TODAY 环境变量的值为: {today}")
+else:
+    print("TODAY 环境变量不存在")    
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current Time =", current_time)
+    today = datetime.today().strftime('%Y-%m-%d')  
 
 # today = "2023-06-26"  
 
@@ -94,6 +104,8 @@ row = zhuli_df[zhuli_df['日期'] == today].reset_index(drop=True)
 # 提取需要的列数据
 desired_columns = ['日期', '上证收盘价', '上证涨跌幅', '深证收盘价', '深证涨跌幅', '主力净流入净额', '主力净流入净占比']
 desireddata = row[desired_columns]
+
+print(desireddata)
 
 data = {
     '日期': [today],

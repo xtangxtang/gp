@@ -174,10 +174,15 @@ def analysis_continue(dir, out_dir, continue_day):
         all_data.to_csv(f"{out_dir}/{date_time}-{continue_day}日-主力净流入.csv")
 
 if __name__ == '__main__':
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current Time =", current_time)
-    date_time = datetime.today().strftime('%Y-%m-%d')    
+    if 'TODAY' in os.environ:
+        date_time = os.environ['TODAY']
+        print(f"TODAY 环境变量的值为: {date_time}")
+    else:
+        print("TODAY 环境变量不存在")    
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        date_time = datetime.today().strftime('%Y-%m-%d')    
     # date_time=""
     # 指定目录路径
     directory = f"../capital/bk"  # 替换为你实际的目录路径    
